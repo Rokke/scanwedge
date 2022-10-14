@@ -14,4 +14,16 @@ class MethodChannelScanwedge extends ScanwedgePlatform {
     final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
     return version;
   }
+
+  @override
+  Future<bool> createProfile({required String profileName}) async {
+    final res = await methodChannel.invokeMethod<bool>('createProfile', {'name': profileName});
+    return res ?? false;
+  }
+
+  @override
+  Future<bool> toggleScanning() async {
+    final res = await methodChannel.invokeMethod<bool>('toggleScan');
+    return res ?? false;
+  }
 }

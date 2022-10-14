@@ -1,7 +1,7 @@
 name: scanwedge
 description: A Flutter plugin to be able to work with the Zebra Datawedge
 version: 0.0.1
-homepage:
+homepage: https://github.com/Rokke/scanwedge
 
 environment:
   sdk: '>=2.19.0-255.2.beta <3.0.0'
