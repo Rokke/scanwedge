@@ -31,8 +31,10 @@ class ScanProfile {
       'PLUGIN_CONFIG': [
         {
           'PARAM_LIST': {
-            'keystroke_output_enabled': (!disableKeystroke).toString(),
-            'keystroke_action_char': "13"
+            'keystroke_output_enabled': 'true',
+            'keystroke_action_char': '13',
+            'keystroke_send_chars_as_events': 'true',
+            'keystroke_send_control_chars_as_events': "true"
           },
           'PLUGIN_NAME': 'KEYSTROKE'
         },
