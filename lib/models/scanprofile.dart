@@ -29,15 +29,15 @@ class ScanProfile {
       'PROFILE_ENABLED': 'true',
       'CONFIG_MODE': configMode,
       'PLUGIN_CONFIG': [
-        {
-          'PARAM_LIST': {
-            'keystroke_output_enabled': 'true',
-            'keystroke_action_char': '13',
-            'keystroke_send_chars_as_events': 'true',
-            'keystroke_send_control_chars_as_events': "true"
-          },
-          'PLUGIN_NAME': 'KEYSTROKE'
-        },
+        // {
+        //   'PARAM_LIST': {
+        //     'keystroke_output_enabled': 'true',
+        //     'keystroke_action_char': '13',
+        //     'keystroke_send_chars_as_events': 'true',
+        //     'keystroke_send_control_chars_as_events': "true"
+        //   },
+        //   'PLUGIN_NAME': 'KEYSTROKE'
+        // },
         if (barcodePlugin != null) barcodePlugin!.toMap,
         {
           'PARAM_LIST': {
