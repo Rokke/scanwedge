@@ -29,15 +29,14 @@ class ScanProfile {
       'PROFILE_ENABLED': 'true',
       'CONFIG_MODE': configMode,
       'PLUGIN_CONFIG': [
-        // {
-        //   'PARAM_LIST': {
-        //     'keystroke_output_enabled': 'true',
-        //     'keystroke_action_char': '13',
-        //     'keystroke_send_chars_as_events': 'true',
-        //     'keystroke_send_control_chars_as_events': "true"
-        //   },
-        //   'PLUGIN_NAME': 'KEYSTROKE'
-        // },
+        {
+          'PARAM_LIST': {
+            'bdf_enabled': 'true',
+            'bdf_send_tab': 'true',
+            'bdf_send_enter': 'true',
+          },
+          'PLUGIN_NAME': 'BDF'
+        },
         if (barcodePlugin != null) barcodePlugin!.toMap,
         {
           'PARAM_LIST': {
@@ -50,7 +49,7 @@ class ScanProfile {
         }
       ],
       'APP_LIST': packageName,
-      'RESET_CONFIG': 'true'
+      'RESET_CONFIG': 'false'
     };
     log('ScanProfile: ${jsonEncode(json)}');
     await scanWedge.sendCommandBundle(
