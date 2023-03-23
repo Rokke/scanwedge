@@ -42,7 +42,7 @@ class ScanProfile {
           },
           'PLUGIN_NAME': 'BDF',
           'OUTPUT_PLUGIN_NAME': 'KEYSTROKE',
-          'RESET_CONFIG': 'true',
+          'RESET_CONFIG': 'false',
         },
         if (barcodePlugin != null) barcodePlugin!.toMap,
         {
