@@ -30,16 +30,19 @@ class ScanProfile {
       'CONFIG_MODE': configMode,
       'PLUGIN_CONFIG': [
         {
-          'PARAM_LIST': {'keystroke_output_enabled': (!disableKeystroke).toString()},
+          'PARAM_LIST': {
+            'keystroke_output_enabled': (!disableKeystroke).toString()
+          },
           'PLUGIN_NAME': 'KEYSTROKE'
         },
         {
           'PARAM_LIST': {
             'bdf_enabled': 'true',
-            'bdf_send_tab': 'true',
             'bdf_send_enter': 'true',
           },
-          'PLUGIN_NAME': 'BDF'
+          'PLUGIN_NAME': 'BDF',
+          'OUTPUT_PLUGIN_NAME': 'KEYSTROKE',
+          'RESET_CONFIG': 'true',
         },
         if (barcodePlugin != null) barcodePlugin!.toMap,
         {
