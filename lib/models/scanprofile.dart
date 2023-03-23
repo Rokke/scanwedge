@@ -36,7 +36,6 @@ class ScanProfile {
         {
           'PARAM_LIST': {
             'bdf_enabled': 'true',
-            'bdf_send_tab': 'true',
             'bdf_send_enter': 'true',
           },
           'PLUGIN_NAME': 'BDF'
