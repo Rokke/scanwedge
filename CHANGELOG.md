@@ -1,3 +1,10 @@
 ## 0.0.1
 
 * Initial Open Source release
+
+## 0.0.4
+* Added [isZebra], [modelName], [productName], [osVersion], [packageName] and [manufacturer]
+* Ignoring request if not a Zebra device
+* Added possibility to enabled/disable given barcodetypes
+* Better source documentation
+* Breaking change, use scanwedge.interface when creating the scanwedge

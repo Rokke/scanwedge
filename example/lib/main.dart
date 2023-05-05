@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:scanwedge/models/aimtype.dart';
 import 'package:scanwedge/models/barcode_plugin.dart';
 import 'package:scanwedge/scanwedge.dart';
 
@@ -18,17 +17,21 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final _scanwedgePlugin = Scanwedge();
+  Scanwedge? _scanwedgePlugin;
   final notifierDisableKeystroke = ValueNotifier(true);
   final notifierAimType = ValueNotifier(AimType.trigger);
 
   @override
   void initState() {
     super.initState();
+    Scanwedge.initialize().then((scanwedge) {
+      _scanwedgePlugin = scanwedge;
+      setState(() {});
+    });
   }
 
   _createProfile() async {
-    log('_createProfile()-${_scanwedgePlugin.createProfile(ScanProfile(profileName: 'TestProfile', disableKeystroke: notifierDisableKeystroke.value, packageName: 'no.talgoe.scanwedge.scanwedge_example', barcodePlugin: BarcodePlugin(aimType: notifierAimType.value)))}');
+    log('_createProfile()-${_scanwedgePlugin?.createProfile(ScanProfile(profileName: 'TestProfile', disableKeystroke: notifierDisableKeystroke.value, packageName: 'no.talgoe.scanwedge.scanwedge_example', barcodePlugin: BarcodePlugin(aimType: notifierAimType.value)))}');
   }
 
   @override
@@ -38,6 +41,15 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
           actions: [
+            IconButton(
+                onPressed: () => debugPrint('${BarcodePlugin(disabledBarcodes: [
+                          BarcodeLabelType.labelTypeCode11,
+                          BarcodeLabelType.labelTypeCode128
+                        ], enabledBarcodes: [
+                          BarcodeLabelType.labelTypeCode39,
+                          BarcodeLabelType.labelTypeCode93
+                        ])..toMap}'),
+                icon: const Icon(Icons.bathtub)),
             IconButton(onPressed: () => exit(0), icon: const Icon(Icons.exit_to_app)),
           ],
         ),
@@ -111,23 +123,25 @@ class _MyAppState extends State<MyApp> {
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Last scan:'),
-                    StreamBuilder(
-                        stream: _scanwedgePlugin.stream,
-                        builder: ((context, snapshot) => Text(
-                              snapshot.hasData
-                                  ? snapshot.data.toString()
-                                  : snapshot.hasError
-                                      ? snapshot.error.toString()
-                                      : 'Scan something',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ))),
-                  ],
-                ),
+                child: _scanwedgePlugin != null
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Last scan:'),
+                          StreamBuilder(
+                              stream: _scanwedgePlugin!.stream,
+                              builder: ((context, snapshot) => Text(
+                                    snapshot.hasData
+                                        ? snapshot.data.toString()
+                                        : snapshot.hasError
+                                            ? snapshot.error.toString()
+                                            : 'Scan something',
+                                    style: Theme.of(context).textTheme.titleMedium,
+                                  ))),
+                        ],
+                      )
+                    : const Center(child: CircularProgressIndicator()),
               ),
             ),
           ],

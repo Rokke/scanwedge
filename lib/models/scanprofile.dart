@@ -1,21 +1,17 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:flutter/foundation.dart';
 import 'package:scanwedge/models/barcode_plugin.dart';
+import 'package:scanwedge/scancommands.dart';
 import 'package:scanwedge/scanwedge_channel.dart';
 
 class ScanProfile {
-  static const datawedgeSendSetConfig = 'com.symbol.datawedge.api.SET_CONFIG';
-  // static const datawedgeSendAction = 'com.symbol.datawedge.api.SET_CONFIG';
-  static const profileIntentAction = 'no.talgoe.scanwedge.scanwedge.SCAN';
   final bool disableKeystroke;
   final String profileName, packageName;
   final BarcodePlugin? barcodePlugin;
   final String configMode;
   ScanProfile({required this.profileName, this.configMode = ProfileCreateType.createIfNotExist, this.disableKeystroke = false, this.barcodePlugin, required this.packageName});
   Future<bool> sendCommands(ScanwedgeChannel scanWedge) async {
-    debugPrint('ScanProfile()');
     final json = {
       'PROFILE_NAME': profileName,
       'PROFILE_ENABLED': 'true',
@@ -29,7 +25,7 @@ class ScanProfile {
         {
           'PARAM_LIST': {
             'intent_output_enabled': 'true',
-            'intent_action': profileIntentAction,
+            'intent_action': ScanCommands.profileIntentAction,
             'intent_delivery': '2',
           },
           'PLUGIN_NAME': 'INTENT',
@@ -39,9 +35,9 @@ class ScanProfile {
       'APP_LIST': packageName,
       'RESET_CONFIG': 'true'
     };
-    log('ScanProfile: ${jsonEncode(json)}');
-    await scanWedge.sendCommandBundle(command: datawedgeSendSetConfig, parameter: json, sendResult: true);
-    return true;
+    final result = await scanWedge.sendCommandBundle(command: ScanCommands.datawedgeSendSetConfig, parameter: json, sendResult: true);
+    log('ScanProfile: ${jsonEncode(json)}-$result');
+    return result;
   }
 
   Map<String, dynamic> getProfile(Map<String, dynamic> child, {String childKeyName = 'PLUGIN_CONFIG'}) =>

@@ -82,9 +82,8 @@ class ScanwedgePlugin: FlutterPlugin, MethodCallHandler {
   }
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     Log.d(TAG, "onMethodCall: ${call.method}, ${call.arguments}")
-    if (call.method == "getPlatformVersion") {
-      channel.invokeMethod("test", "testarg")
-      result.success("Android ${android.os.Build.VERSION.RELEASE}")
+    if (call.method == "getDeviceInfo") {
+      result.success("${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}|${context.getPackageName()}")
     }else if (call.method == "createProfile") {
       val profileName=call.argument<String>("profileName")
       val packageName=call.argument<String>("packageName")
