@@ -19,7 +19,7 @@ class Scanwedge {
   Stream<ScanResult> get stream => _scanwedgeChannel.stream;
 
   /// Returns if the given device is supported. This will also be used when calling the different methods
-  bool get isDeviceSupported => _scanwedgeChannel.isZebra;
+  bool get isDeviceSupported => _scanwedgeChannel.isDeviceSupported;
 
   /// Gives the model name of the device it runs on. Example 'TC57'
   String get modelName => _scanwedgeChannel.modelName;

@@ -11,10 +11,12 @@ class ScanwedgeChannel {
   // static final ScanwedgeChannel instance = ScanwedgeChannel._init();
   static const _methodChannel = MethodChannel(channel);
   final _streamController = StreamController<ScanResult>.broadcast();
-  bool isZebra = false;
+  bool _supportedDevice = false;
   //"${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}"
   String? _manufacturer, _model, _product, _osVersion, _packageName;
-  bool get isDeviceSupported => isZebra;
+  @Deprecated('This is for backwards compatibility, use isDeviceSupported instead')
+  bool get isZebra => isDeviceSupported;
+  bool get isDeviceSupported => _supportedDevice;
   String get modelName => _model ?? '';
   String get productName => _product ?? '';
   String get manufacturer => _manufacturer ?? '';
@@ -31,8 +33,8 @@ class ScanwedgeChannel {
         _model = devInfoString[1];
         _product = devInfoString[2];
         _osVersion = devInfoString[3];
-        isZebra = _manufacturer!.toUpperCase().startsWith('ZEBRA') || _model!.toUpperCase().startsWith('ZEBRA');
-        debugPrint('deviceInfo($_manufacturer, $_model, $_product, $_osVersion)-$isZebra');
+        _supportedDevice = _manufacturer!.toUpperCase().startsWith('ZEBRA') || _model!.toUpperCase().startsWith('ZEBRA');
+        debugPrint('deviceInfo($_manufacturer, $_model, $_product, $_osVersion)-$_supportedDevice');
       }
     }
     // });

@@ -15,12 +15,14 @@ Code inspired
 |**disableScanner**|Disables the scanner|
 |**suspendScanner**|Suspends the scanner|
 |**resumeScanner**|Resumes the scanner|
-|**isZebra**|Returns true if it's a Zebra device, if this is false no methods will be called on the device|
+|**isZebra**|deprecated use [isDeviceSupported] instead|
 |**modelName**|Returns the modelname of the device|
 |**productName**|Returns the productname of the device|
 |**osVersion**|Returns the OS version on the device|
 |**manufacturer**|Returns the manufacturer of the device|
 |**packageName**|Returns the package name of the host application, this will also be used as default package name in [ScanProfile] if not set|
+|**isDeviceSupported**|Returns true if it's a Zebra device, if this is false no methods will be called on the device, replacing [isZebra]|
+
 
 >Difference between enable/disable and suspend/resume is that enable/disable will work even if the scanner is ready but suspend/resume is much faster but will not work if scanner is not ready
 
