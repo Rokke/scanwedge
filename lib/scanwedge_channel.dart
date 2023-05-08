@@ -33,6 +33,7 @@ class ScanwedgeChannel {
         _model = devInfoString[1];
         _product = devInfoString[2];
         _osVersion = devInfoString[3];
+        _packageName = devInfoString[4];
         _supportedDevice = _manufacturer!.toUpperCase().startsWith('ZEBRA') || _model!.toUpperCase().startsWith('ZEBRA');
         debugPrint('deviceInfo($_manufacturer, $_model, $_product, $_osVersion)-$_supportedDevice');
       }
