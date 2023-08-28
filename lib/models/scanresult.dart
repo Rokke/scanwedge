@@ -3,6 +3,7 @@ class ScanResult {
   final BarcodeLabelType labelType;
 
   ScanResult({required this.barcode, required this.labelType});
+
   static BarcodeLabelType stringToBarcodeLabelType(String labelType) {
     switch (labelType) {
       case "LABEL-TYPE-CODE39":
@@ -125,7 +126,10 @@ class ScanResult {
     }
   }
 
-  factory ScanResult.fromDatawedge(dynamic json) => ScanResult(barcode: json['barcode'], labelType: stringToBarcodeLabelType(json['labelType']));
+  factory ScanResult.fromDatawedge(dynamic json) => ScanResult(
+      barcode: json['barcode'],
+      labelType: stringToBarcodeLabelType(json['labelType']));
+
   @override
   String toString() => 'ScanResult($barcode, $labelType)';
 }

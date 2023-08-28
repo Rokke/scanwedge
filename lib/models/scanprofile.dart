@@ -15,12 +15,13 @@ class ScanProfile {
   final BarcodePlugin? barcodePlugin;
   final String configMode;
 
-  ScanProfile(
-      {required this.profileName,
-      this.configMode = ProfileCreateType.createIfNotExist,
-      this.disableKeystroke = false,
-      this.barcodePlugin,
-      required this.packageName});
+  ScanProfile({
+    required this.profileName,
+    this.configMode = ProfileCreateType.createIfNotExist,
+    this.disableKeystroke = false,
+    this.barcodePlugin,
+    required this.packageName,
+  });
 
   Future<bool> sendCommands(ScanwedgeChannel scanWedge) async {
     debugPrint('ScanProfile()');
@@ -30,29 +31,29 @@ class ScanProfile {
       'CONFIG_MODE': configMode,
       'PLUGIN_CONFIG': [
         {
+          'PLUGIN_NAME': 'KEYSTROKE',
           'PARAM_LIST': {
-            'keystroke_output_enabled': (!disableKeystroke).toString()
+            'keystroke_output_enabled': (!disableKeystroke).toString(),
           },
-          'PLUGIN_NAME': 'KEYSTROKE'
         },
         {
+          'PLUGIN_NAME': 'BDF',
+          'OUTPUT_PLUGIN_NAME': 'KEYSTROKE',
+          'RESET_CONFIG': 'false',
           'PARAM_LIST': {
             'bdf_enabled': 'true',
             'bdf_send_enter': 'true',
           },
-          'PLUGIN_NAME': 'BDF',
-          'OUTPUT_PLUGIN_NAME': 'KEYSTROKE',
-          'RESET_CONFIG': 'false',
         },
         if (barcodePlugin != null) barcodePlugin!.toMap,
         {
+          'PLUGIN_NAME': 'INTENT',
+          'RESET_CONFIG': 'true',
           'PARAM_LIST': {
             'intent_output_enabled': 'true',
             'intent_action': profileIntentAction,
             'intent_delivery': '2',
           },
-          'PLUGIN_NAME': 'INTENT',
-          'RESET_CONFIG': 'true'
         }
       ],
       'APP_LIST': packageName,
@@ -60,17 +61,22 @@ class ScanProfile {
     };
     log('ScanProfile: ${jsonEncode(json)}');
     await scanWedge.sendCommandBundle(
-        command: datawedgeSendSetConfig, parameter: json, sendResult: true);
+      command: datawedgeSendSetConfig,
+      parameter: json,
+      sendResult: true,
+    );
     return true;
   }
 
-  Map<String, dynamic> getProfile(Map<String, dynamic> child,
-          {String childKeyName = 'PLUGIN_CONFIG'}) =>
+  Map<String, dynamic> getProfile(
+    Map<String, dynamic> child, {
+    String childKeyName = 'PLUGIN_CONFIG',
+  }) =>
       {
         'PROFILE_NAME': profileName,
         'PROFILE_ENABLED': 'true',
         'CONFIG_MODE': configMode,
-        childKeyName: child
+        childKeyName: child,
       };
 }
 
