@@ -53,6 +53,7 @@ class Scanwedge {
 
   /// Suspends the DataWedge scanprofile, this is quicker than the [disableScanner]
   Future<void> suspendScanner() => _scanwedgeChannel.sendCommand(command: ScanCommands.scannerInputPlugin, parameter: 'SUSPEND_PLUGIN');
+  Future<String?> getDeviceInfo() => _scanwedgeChannel.getDeviceInfo();
 
   /// Resumes the DataWedge scanprofile, this is quicker than the [enableScanner]
   Future<void> resumeScanner() => _scanwedgeChannel.sendCommand(command: ScanCommands.scannerInputPlugin, parameter: 'RESUME_PLUGIN');

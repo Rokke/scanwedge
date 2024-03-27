@@ -18,6 +18,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Scanwedge? _scanwedgePlugin;
+  String? _deviceInfo;
   final notifierDisableKeystroke = ValueNotifier(true);
   final notifierAimType = ValueNotifier(AimType.trigger);
 
@@ -27,11 +28,16 @@ class _MyAppState extends State<MyApp> {
     Scanwedge.initialize().then((scanwedge) {
       _scanwedgePlugin = scanwedge;
       setState(() {});
+      scanwedge.getDeviceInfo().then((devInfo) => setState(() {
+            _deviceInfo = devInfo;
+          }));
     });
   }
 
   _createProfile() async {
-    log('_createProfile()-${_scanwedgePlugin?.createProfile(ScanProfile(profileName: 'TestProfile', disableKeystroke: notifierDisableKeystroke.value, packageName: 'no.talgoe.scanwedge.scanwedge_example', barcodePlugin: BarcodePlugin(aimType: notifierAimType.value)))}');
+    log('_createProfile()-${await _scanwedgePlugin?.createProfile(ScanProfile(profileName: 'TestProfile', disableKeystroke: notifierDisableKeystroke.value, packageNames: [
+          'no.talgoe.scanwedge.scanwedge_example'
+        ], barcodePlugin: BarcodePlugin(aimType: notifierAimType.value)))}');
   }
 
   @override
@@ -58,6 +64,7 @@ class _MyAppState extends State<MyApp> {
           // mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             // ElevatedButton(onPressed: _scanwedgePlugin.test, child: const Text('Create profile')),
+            Text(_deviceInfo ?? 'No device info', style: Theme.of(context).textTheme.labelSmall),
             Card(
                 child: Padding(
               padding: const EdgeInsets.all(8.0),

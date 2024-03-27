@@ -2,7 +2,7 @@
   package="no.talgoe.scanwedge.scanwedge">
   <application>
     <receiver
-      android:name=".Scanwedge"
+      android:name="${applicationName}"
       android:enabled="true"
       android:exported="false">
         <intent-filter>

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 void main() {
   final lst = List.generate(5, (index) => 'list$index');
   final map = {'1': '2'};

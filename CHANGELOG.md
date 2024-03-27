@@ -13,3 +13,6 @@
 * Added possibility to enable or disable barcodetypes
 * deprecating isZebra, use isDeviceSupported instead
 * Updated packaged and Dart SDK
+
+## 0.1.0+6
+* Fixed creation of APP_LIST and PLUGIN_CONFIG

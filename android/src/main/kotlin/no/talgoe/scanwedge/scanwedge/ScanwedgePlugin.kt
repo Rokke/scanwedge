@@ -60,9 +60,14 @@ class ScanwedgePlugin: FlutterPlugin, MethodCallHandler {
         else if(intent.action.equals(RESULT_ACTION)){
           if(intent.hasExtra("RESULT_LIST")){
             val res=intent.getSerializableExtra("RESULT_LIST") as ArrayList<Bundle>
-            res.forEach{ rInfo->
-              Log.i(TAG, "RESULT_INFO-$rInfo, ${rInfo.keySet().joinToString(", ", "{", "}"){it->"$it=${rInfo[it]}"}}")
-            }
+            val jsonList=mapOf("modules" to res.map{rInfo->
+              // Log.i(TAG, "RESULT_INFO-$rInfo, ${rInfo.keySet().joinToString(", ", "{", "}"){it->"$it=${rInfo[it]}"}}")
+              mapOf("module" to rInfo.getString("MODULE"),"result" to rInfo.getString("RESULT"))
+            })
+            channel.invokeMethod("result", jsonList)
+            // res.forEach{ rInfo->
+            //   Log.i(TAG, "RESULT_INFO-$rInfo, ${rInfo.keySet().joinToString(", ", "{", "}"){it->"$it=${rInfo[it]}"}}")
+            // }
           }
           // Log.i(TAG, "RESULT-${res!!["RESULT_CODE"]}")
           // Log.i(TAG, "RESULT_INFO-$str")
@@ -97,7 +102,7 @@ class ScanwedgePlugin: FlutterPlugin, MethodCallHandler {
     }else if(call.method=="sendCommand"){
       val command=call.argument<String>("command")
       val parameter=call.argument<String>("parameter")
-      Log.i(TAG, "onMethodCall: sendCommand($command, $parameter)")
+      // Log.i(TAG, "onMethodCall: sendCommand($command, $parameter)")
       val dwIntent = Intent()
       dwIntent.action = DATAWEDGE_SEND_ACTION
       dwIntent.putExtra(call.argument<String>("command"), call.argument<String>("parameter"))
@@ -107,12 +112,12 @@ class ScanwedgePlugin: FlutterPlugin, MethodCallHandler {
       val command=call.argument<String>("command")
       val parameter=call.argument<HashMap<String,Any>>("parameter")
       val shouldRetry=call.argument<Boolean>("sendResult")
-      Log.i(TAG, "onMethodCall: sendCommandBundle($command, $parameter, $shouldRetry)")
+      // Log.i(TAG, "onMethodCall: sendCommandBundle($command, $parameter, $shouldRetry)")
       if(parameter!=null){
         val dwIntent = Intent()
         dwIntent.action = DATAWEDGE_SEND_ACTION
         val bundle=iterateIntent(parameter)
-        Log.d(TAG, "iterateIntent return: $bundle")
+        // Log.d(TAG, "iterateIntent return: $bundle")
         dwIntent.putExtra(command, bundle)
         if(shouldRetry==true){
           Log.i(TAG, "onMethodCall: SEND_RESULT")
@@ -120,7 +125,7 @@ class ScanwedgePlugin: FlutterPlugin, MethodCallHandler {
           dwIntent.putExtra("COMMAND_IDENTIFIER", "INTENT_API")
         }
         context.sendBroadcast(dwIntent)
-        Log.i(TAG, "onMethodCall: sendCommandBundleOK: $dwIntent, ${dwIntent.extras}")
+        // Log.i(TAG, "onMethodCall: sendCommandBundleOK: $dwIntent, ${dwIntent.extras}")
         result.success(true)
       }else{
         Log.w(TAG, "onMethodCall: no parameter")
@@ -153,26 +158,42 @@ class ScanwedgePlugin: FlutterPlugin, MethodCallHandler {
     for((key,value) in parameter){
       val value=parameter[key]
       if(value is String){
-        if(key.equals("APP_LIST")) bundle.putParcelableArray("APP_LIST", createIntent(value))
-        else bundle.putString(key, value)
+        // if(key.equals("APP_LIST")) bundle.putParcelableArray("APP_LIST", createIntent(value))
+        // Log.d(TAG, "putString: $key => $value")
+        bundle.putString(key, value)
       }else{
+        // Log.d(TAG, "$key: ${value?.javaClass}")
         if(value is List<*>){
-          // Log.d(TAG, "List")
-          val bundleArray =value.map{iterateIntent(it as HashMap<String,Any>)} as ArrayList<Bundle>
-          Log.d(TAG, "List OK: $bundleArray")
-          bundle.putParcelableArrayList(key, bundleArray)
-          // Log.d(TAG, "List OK: $bundle")
-          // val bundleArray = ArrayList<Bundle>()
-          // val bundleTst=Bundle()
-          // val bundleKey=Bundle()
-          // bundleKey.putString("PLUGIN_NAME", "KEYSTROKE")
-
-          // bundleTst.putString("PARAM_LIST", "keystroke_output_enabled")
-          // bundleArray.add(bundleTst)
-          // val arr=bundleArray.toArray() as Array<Bundle>
-          // value.forEach{ bundleArray.add(iterateIntent(it as HashMap<String,Any>)) }
-          // bundle.putParcelableArray(key, bundleArray.toTypedArray())
-        }else bundle.putBundle(key, iterateIntent(value as HashMap<String,Any>))
+          // Log.d(TAG, "List($key)")
+          val bundleArray=ArrayList(value.filter{ it is HashMap<*,*>}.map{
+            iterateIntent(it as HashMap<String,Any>)
+          })
+          if(bundleArray.isNotEmpty()){
+            // Log.d(TAG, "putParcelableArrayList: $key => $bundleArray")
+            if(key=="APP_LIST") bundle.putParcelableArray(key, bundleArray.toTypedArray())
+            else bundle.putParcelableArrayList(key, bundleArray)
+          }
+          val stringArray=value.filter{ it is String}.map{ it as String }
+          if(stringArray.isNotEmpty()){
+            // Log.d(TAG, "putStringArray: $key => $stringArray")
+            bundle.putStringArray(key, stringArray.toTypedArray())
+          }
+          // if(value.first() is HashMap<*,*>){
+          //   // if(key=="APP_LIST2") bundle.putParcelableArray("APP_LIST", createIntent("no.test.talgoe"))
+          //   // else{
+          //     val bundleArray = value.map{ iterateIntent(it as HashMap<String,Any>)} as ArrayList<Bundle>
+          //     Log.d(TAG, "putParcelableArrayList: $key => $bundleArray")
+          //     bundle.putParcelableArray(key, bundleArray.toTypedArray())
+          //   // }
+          // }
+          // else{
+          //   bundle.putStringArray(key, arrayOf("*"))//(value as List<String?>).toTypedArray())
+          //   Log.d(TAG, "putStringArray: $key => ${arrayOf("*")}")
+          // }
+        }else{
+          // Log.d(TAG, "putBundle: $key => $value")
+          bundle.putBundle(key, iterateIntent(value as HashMap<String,Any>))
+        }
         // else if(key.startsWith("*")) bundle.putParcelableArray(key.substring(1), arrayOf(iterateIntent(value as HashMap<String,Any>)))
       }
     }
@@ -181,11 +202,8 @@ class ScanwedgePlugin: FlutterPlugin, MethodCallHandler {
   fun createIntent(packageName:String):Array<Bundle>{
     Log.i(TAG, "createIntent($packageName)")
     val bundle=Bundle()
-    // bundle.putString("PACKAGE_NAME", "no.talgoe.scanwedge.scanwedge")
     bundle.putStringArray("ACTIVITY_LIST", arrayOf("*"))
-    // val bundle2=Bundle()
     bundle.putString("PACKAGE_NAME", packageName)
-    // bundle2.putStringArray("ACTIVITY_LIST", arrayOf("*"))
     return arrayOf(bundle)
   }
 
