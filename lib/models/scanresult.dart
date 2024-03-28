@@ -5,121 +5,121 @@ class ScanResult {
   ScanResult({required this.barcode, required this.labelType});
   static BarcodeLabelType stringToBarcodeLabelType(String labelType) {
     switch (labelType) {
-      case "LABEL-TYPE-CODE39":
+      case "CODE39":
         return BarcodeLabelType.labelTypeCode39;
-      case "LABEL-TYPE-CODABAR":
+      case "CODABAR":
         return BarcodeLabelType.labelTypeCodabar;
-      case "LABEL-TYPE-CODE128":
+      case "CODE128":
         return BarcodeLabelType.labelTypeCode128;
-      case "LABEL-TYPE-D2OF5":
+      case "D2OF5":
         return BarcodeLabelType.labelTypeD2of5;
-      case "LABEL-TYPE-IATA2OF5":
+      case "IATA2OF5":
         return BarcodeLabelType.labelTypeIata2of5;
-      case "LABEL-TYPE-I2OF5":
+      case "I2OF5":
         return BarcodeLabelType.labelTypeI2of5;
-      case "LABEL-TYPE-CODE93":
+      case "CODE93":
         return BarcodeLabelType.labelTypeCode93;
-      case "LABEL-TYPE-UPCA":
+      case "UPCA":
         return BarcodeLabelType.labelTypeUpca;
-      case "LABEL-TYPE-UPCE0":
+      case "UPCE0":
         return BarcodeLabelType.labelTypeUpce0;
-      case "LABEL-TYPE-UPCE1":
+      case "UPCE1":
         return BarcodeLabelType.labelTypeUpce1;
-      case "LABEL-TYPE-EAN8":
+      case "EAN8":
         return BarcodeLabelType.labelTypeEan8;
-      case "LABEL-TYPE-EAN13":
+      case "EAN13":
         return BarcodeLabelType.labelTypeEan13;
-      case "LABEL-TYPE-MSI":
+      case "MSI":
         return BarcodeLabelType.labelTypeMsi;
-      case "LABEL-TYPE-EAN128":
+      case "EAN128":
         return BarcodeLabelType.labelTypeEan128;
-      case "LABEL-TYPE-TRIOPTIC39":
+      case "TRIOPTIC39":
         return BarcodeLabelType.labelTypeTrioptic39;
-      case "LABEL-TYPE-BOOKLAND":
+      case "BOOKLAND":
         return BarcodeLabelType.labelTypeBookland;
-      case "LABEL-TYPE-COUPON":
+      case "COUPON":
         return BarcodeLabelType.labelTypeCoupon;
-      case "LABEL-TYPE-DATABAR-COUPON":
+      case "DATABAR-COUPON":
         return BarcodeLabelType.labelTypeDatabarCoupon;
-      case "LABEL-TYPE-ISBT128":
+      case "ISBT128":
         return BarcodeLabelType.labelTypeIsbt128;
-      case "LABEL-TYPE-CODE32":
+      case "CODE32":
         return BarcodeLabelType.labelTypeCode32;
-      case "LABEL-TYPE-PDF417":
+      case "PDF417":
         return BarcodeLabelType.labelTypePdf417;
-      case "LABEL-TYPE-MICROPDF":
+      case "MICROPDF":
         return BarcodeLabelType.labelTypeMicropdf;
-      case "LABEL-TYPE-TLC39":
+      case "TLC39":
         return BarcodeLabelType.labelTypeTlc39;
-      case "LABEL-TYPE-CODE11":
+      case "CODE11":
         return BarcodeLabelType.labelTypeCode11;
-      case "LABEL-TYPE-MAXICODE":
+      case "MAXICODE":
         return BarcodeLabelType.labelTypeMaxicode;
-      case "LABEL-TYPE-DATAMATRIX":
+      case "DATAMATRIX":
         return BarcodeLabelType.labelTypeDatamatrix;
-      case "LABEL-TYPE-QRCODE":
+      case "QRCODE":
         return BarcodeLabelType.labelTypeQrcode;
-      case "LABEL-TYPE-GS1-DATABAR":
+      case "GS1-DATABAR":
         return BarcodeLabelType.labelTypeGs1Databar;
-      case "LABEL-TYPE-GS1-DATABAR-LIM":
+      case "GS1-DATABAR-LIM":
         return BarcodeLabelType.labelTypeGs1DatabarLim;
-      case "LABEL-TYPE-GS1-DATABAR-EXP":
+      case "GS1-DATABAR-EXP":
         return BarcodeLabelType.labelTypeGs1DatabarExp;
-      case "LABEL-TYPE-USPOSTNET":
+      case "USPOSTNET":
         return BarcodeLabelType.labelTypeUspostnet;
-      case "LABEL-TYPE-USPLANET":
+      case "USPLANET":
         return BarcodeLabelType.labelTypeUsplanet;
-      case "LABEL-TYPE-UKPOSTAL":
+      case "UKPOSTAL":
         return BarcodeLabelType.labelTypeUkpostal;
-      case "LABEL-TYPE-JAPPOSTAL":
+      case "JAPPOSTAL":
         return BarcodeLabelType.labelTypeJappostal;
-      case "LABEL-TYPE-AUSPOSTAL":
+      case "AUSPOSTAL":
         return BarcodeLabelType.labelTypeAuspostal;
-      case "LABEL-TYPE-DUTCHPOSTAL":
+      case "DUTCHPOSTAL":
         return BarcodeLabelType.labelTypeDutchpostal;
-      case "LABEL-TYPE-FINNISHPOSTAL-4S":
+      case "FINNISHPOSTAL-4S":
         return BarcodeLabelType.labelTypeFinnishpostal4s;
-      case "LABEL-TYPE-CANPOSTAL":
+      case "CANPOSTAL":
         return BarcodeLabelType.labelTypeCanpostal;
-      case "LABEL-TYPE-CHINESE-2OF5":
+      case "CHINESE-2OF5":
         return BarcodeLabelType.labelTypeChinese2of5;
-      case "LABEL-TYPE-AZTEC":
+      case "AZTEC":
         return BarcodeLabelType.labelTypeAztec;
-      case "LABEL-TYPE-MICROQR":
+      case "MICROQR":
         return BarcodeLabelType.labelTypeMicroqr;
-      case "LABEL-TYPE-US4STATE":
+      case "US4STATE":
         return BarcodeLabelType.labelTypeUs4state;
-      case "LABEL-TYPE-US4STATE-FICS":
+      case "US4STATE-FICS":
         return BarcodeLabelType.labelTypeUs4stateFics;
-      case "LABEL-TYPE-COMPOSITE-AB":
+      case "COMPOSITE-AB":
         return BarcodeLabelType.labelTypeCompositeAb;
-      case "LABEL-TYPE-COMPOSITE-C":
+      case "COMPOSITE-C":
         return BarcodeLabelType.labelTypeCompositeC;
-      case "LABEL-TYPE-WEBCODE":
+      case "WEBCODE":
         return BarcodeLabelType.labelTypeWebcode;
-      case "LABEL-TYPE-SIGNATURE":
+      case "SIGNATURE":
         return BarcodeLabelType.labelTypeSignature;
-      case "LABEL-TYPE-KOREAN-3OF5":
+      case "KOREAN-3OF5":
         return BarcodeLabelType.labelTypeKorean3of5;
-      case "LABEL-TYPE-MATRIX-2OF5":
+      case "MATRIX-2OF5":
         return BarcodeLabelType.labelTypeMatrix2of5;
-      case "LABEL-TYPE-OCR":
+      case "OCR":
         return BarcodeLabelType.labelTypeOcr;
-      case "LABEL-TYPE-HANXIN":
+      case "HANXIN":
         return BarcodeLabelType.labelTypeHanxin;
-      case "LABEL-TYPE-MAILMARK":
+      case "MAILMARK":
         return BarcodeLabelType.labelTypeMailmark;
       case "MULTICODE-DATA-FORMAT":
         return BarcodeLabelType.multicodeDataFormat;
-      case "LABEL-TYPE-GS1-DATAMATRIX":
+      case "GS1-DATAMATRIX":
         return BarcodeLabelType.labelTypeGs1Datamatrix;
-      case "LABEL-TYPE-GS1-QRCODE":
+      case "GS1-QRCODE":
         return BarcodeLabelType.labelTypeGs1Qrcode;
-      case "LABEL-TYPE-DOTCODE":
+      case "DOTCODE":
         return BarcodeLabelType.labelTypeDotcode;
-      case "LABEL-TYPE-GRIDMATRIX":
+      case "GRIDMATRIX":
         return BarcodeLabelType.labelTypeGridmatrix;
-      case "LABEL-TYPE-UNDEFINED":
+      case "UNDEFINED":
       default:
         return BarcodeLabelType.labelTypeUndefined;
     }

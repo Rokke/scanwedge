@@ -23,7 +23,7 @@ class ScanProfile {
     this.configMode = ProfileCreateType.createIfNotExist,
     this.disableKeystroke = false,
     this.barcodePlugin,
-    required this.packageNames,
+    this.packageNames = const [],
     this.optionalMap,
     this.profileIntentAction = ScanCommands.profileIntentAction,
   });
@@ -63,6 +63,12 @@ class ScanProfile {
     return result;
   }
 
+  Map<String, dynamic> get toMap => {
+        'name': profileName,
+        'keystroke_output_enabled': !disableKeystroke,
+        'barcodePlugin': barcodePlugin?.toMap,
+      };
+  @Deprecated('This is for backwards compatibility, this will soon be removed')
   Map<String, dynamic> getProfile(Map<String, dynamic> child, {String childKeyName = 'PLUGIN_CONFIG'}) =>
       {'PROFILE_NAME': profileName, 'PROFILE_ENABLED': 'true', 'CONFIG_MODE': configMode, childKeyName: child};
 }

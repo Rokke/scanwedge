@@ -40,7 +40,13 @@ class Scanwedge {
   /// [profileName] is the name for the package that will be visible in the profile list on the device.
   /// [packageName] inside the [ScanProfile] is optional and if omitted the packageName for this host application will be used witch is mostly what you want.
   /// If you want to use this application only to create profile for some other application, then you should use that applications package name instead
-  Future<bool> createProfile(ScanProfile profile) => profile.sendCommands(_scanwedgeChannel);
+  @Deprecated('This is for backwards compatibility, use createScanProfile instead')
+  Future<bool> createProfile(ScanProfile profile) => switch (_scanwedgeChannel.supportedDevice) {
+        SupportedDevice.honeywell => createScanProfile(profile),
+        SupportedDevice.zebra => profile.sendCommands(_scanwedgeChannel),
+        _ => throw UnsupportedError('This device is not supported')
+      };
+  Future<bool> createScanProfile(ScanProfile profile) => _scanwedgeChannel.createProfile(profile: profile);
 
   /// Toggles the activation of the scanner
   Future<bool> toggleScanning() => _scanwedgeChannel.toggleScanning();

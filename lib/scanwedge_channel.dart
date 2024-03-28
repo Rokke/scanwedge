@@ -4,29 +4,33 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:scanwedge/models/scanresult.dart';
+import 'package:scanwedge/scanwedge.dart';
+
+enum SupportedDevice { zebra, honeywell, invalid }
 
 class ScanwedgeChannel {
   static const channel = 'scanwedge';
   // static final ScanwedgeChannel instance = ScanwedgeChannel._init();
   static const _methodChannel = MethodChannel(channel);
   final _streamController = StreamController<ScanResult>.broadcast();
-  bool _supportedDevice = false;
+  final SupportedDevice supportedDevice;
+  // String? _supportedDeviceManufacturer;
   //"${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}"
   String? _manufacturer, _model, _product, _osVersion, _packageName, _lastCompleterError;
   Completer<String>? completerSendCommandBundle;
   @Deprecated('This is for backwards compatibility, use isDeviceSupported instead')
   bool get isZebra => isDeviceSupported;
-  bool get isDeviceSupported => _supportedDevice;
+  bool get isDeviceSupported => supportedDevice != SupportedDevice.invalid;
   String get modelName => _model ?? '';
   String get productName => _product ?? '';
   String get manufacturer => _manufacturer ?? '';
   String get osVersion => _osVersion ?? '';
   String get packageName => _packageName ?? '';
-  ScanwedgeChannel._({required String? deviceInfo}) {
+  ScanwedgeChannel._({required String? supportedAPI, String? deviceInfo})
+      : supportedDevice = switch (supportedAPI) { 'ZEBRA' => SupportedDevice.zebra, 'HONEYWELL' => SupportedDevice.honeywell, _ => SupportedDevice.invalid } {
     _methodChannel.setMethodCallHandler(_methodHandler);
     // getDeviceInfo().then((deviceInfo) {
-    debugPrint('getDeviceInfo: $deviceInfo');
+    debugPrint('~: $supportedAPI');
     if (deviceInfo != null) {
       final devInfoString = deviceInfo.split('|');
       _manufacturer = devInfoString.first;
@@ -35,8 +39,7 @@ class ScanwedgeChannel {
         _product = devInfoString[2];
         _osVersion = devInfoString[3];
         _packageName = devInfoString[4];
-        _supportedDevice = _manufacturer!.toUpperCase().startsWith('ZEBRA') || _model!.toUpperCase().startsWith('ZEBRA');
-        debugPrint('deviceInfo($_manufacturer, $_model, $_product, $_osVersion)-$_supportedDevice');
+        debugPrint('deviceInfo($_manufacturer, $_model, $_product, $_osVersion)-$supportedDevice');
       }
     }
     // });
@@ -48,10 +51,10 @@ class ScanwedgeChannel {
   static Future<ScanwedgeChannel> initialize() async {
     debugPrint('init called');
     if (!kIsWeb && Platform.isAndroid) {
-      final deviceInfo = await _methodChannel.invokeMethod<String>('getDeviceInfo');
-      return ScanwedgeChannel._(deviceInfo: deviceInfo);
+      final manufacturer = await _methodChannel.invokeMethod<String>('initializeDataWedge');
+      return ScanwedgeChannel._(supportedAPI: manufacturer);
     }
-    return ScanwedgeChannel._(deviceInfo: null);
+    return ScanwedgeChannel._(supportedAPI: '');
   }
 
   Future<void> _methodHandler(MethodCall call) async {
@@ -88,7 +91,9 @@ class ScanwedgeChannel {
   Future<String?> getDeviceInfo() async => await _methodChannel.invokeMethod<String>('getDeviceInfo');
 
   Future<bool> toggleScanning() async => isDeviceSupported ? await _methodChannel.invokeMethod<bool>('toggleScan') ?? false : false;
+  Future<bool> createProfile({required ScanProfile profile}) async => isDeviceSupported ? await _methodChannel.invokeMethod<bool>('createProfile', profile.toMap) ?? false : false;
 
+  @Deprecated('This is for backwards compatibility, use correct specific method instead')
   Future<bool> sendCommand({required String command, required String parameter}) async =>
       isDeviceSupported ? await _methodChannel.invokeMethod<bool>('sendCommand', {'command': command, 'parameter': parameter}) ?? false : false;
 

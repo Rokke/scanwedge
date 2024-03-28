@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   package="no.talgoe.scanwedge.scanwedge">
+  <uses-permission android:name="com.honeywell.decode.permission.DECODE" />
   <application>
     <receiver
       android:name="${applicationName}"
@@ -7,7 +8,8 @@
       android:exported="false">
         <intent-filter>
             <action android:name="com.symbol.datawedge.api.ACTION" />
-            <action android:name="no.talgoe.scanwedge.scanwedge.SCAN" />
+            <action android:name="com.honeywell.aidc.action.ACTION_CLAIM_SCANNER" />
+            <!-- <action android:name="no.talgoe.scanwedge.scanwedge.SCAN" /> -->
         </intent-filter>
     </receiver>
   </application>

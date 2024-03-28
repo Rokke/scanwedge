@@ -24,3 +24,14 @@ class BarcodePlugin {
   @override
   toString() => toMap.toString();
 }
+
+class BarcodeConfiguration {
+  final List<BarcodeLabelType> barcodes;
+  BarcodeConfiguration({required this.barcodes});
+  List<Map> get toMap => [
+        for (final barcode in barcodes)
+          {
+            'decoder_${BarcodePlugin.fetchDecoderName(barcode)}': 'true',
+          }
+      ];
+}

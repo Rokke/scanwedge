@@ -1,11 +1,13 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:commonui/commonui.dart';
 import 'package:flutter/material.dart';
 import 'package:scanwedge/models/barcode_plugin.dart';
 import 'package:scanwedge/scanwedge.dart';
 
 void main() {
+  CommonLogger.initializeLogger(logName: 'MDMDevice', logLevel: ClassLoggerLevel.debug);
   runApp(const MyApp());
 }
 
@@ -16,7 +18,7 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with ClassLogger {
   Scanwedge? _scanwedgePlugin;
   String? _deviceInfo;
   final notifierDisableKeystroke = ValueNotifier(true);
@@ -35,13 +37,14 @@ class _MyAppState extends State<MyApp> {
   }
 
   _createProfile() async {
-    log('_createProfile()-${await _scanwedgePlugin?.createProfile(ScanProfile(profileName: 'TestProfile', disableKeystroke: notifierDisableKeystroke.value, packageNames: [
+    log('_createProfile()-${await _scanwedgePlugin?.createScanProfile(ScanProfile(profileName: 'TestProfile', disableKeystroke: notifierDisableKeystroke.value, packageNames: [
           'no.talgoe.scanwedge.scanwedge_example'
         ], barcodePlugin: BarcodePlugin(aimType: notifierAimType.value)))}');
   }
 
   @override
   Widget build(BuildContext context) {
+    logD('build', 'build');
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
