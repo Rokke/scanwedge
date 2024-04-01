@@ -1,63 +1,71 @@
 # Scanwedge
 
-Scanwedge is a Flutter plugin for Zebra devices with DataWedge to receive barcodes and create profiles.<br>
-It might support other devices later.<br>
-This will only work on Android Zebra devices, but it will not have any negative impact on other devices.<br>
-Code inspired
+Scanwedge is a Flutter plugin for Android devices that have hardware barcode scanner functionality.<br>
+Currently it supports Honeywell and Zebra devices.<br>
+This will only work for these Android devices, but it will not have any negative impact on other devices.<br>
+Code inspired by sample code from Honeywell, Zebra and ofcourse the whole Flutter community.
 
 ## Getting Started
 
 ### Commands
 |Command|Description|
 |-|-|
-|**createProfile**|Created a new scanprofile, input is a [ScanProfile](#markdown-header-scanprofile) that decide rules for the scanprofile created|
+|**createProfile**|Created a new scanner profile, input is a [ProfileModel](#markdown-header-profilemodel)|
+|**disableScanner**|Disables the scanner, for Honeywell devices it will still "read" but not send the result|
 |**enableScanner**|Enables the scanner|
-|**disableScanner**|Disables the scanner|
-|**suspendScanner**|Suspends the scanner|
-|**resumeScanner**|Resumes the scanner|
-|**isZebra**|deprecated use [isDeviceSupported] instead|
-|**modelName**|Returns the modelname of the device|
-|**productName**|Returns the productname of the device|
-|**osVersion**|Returns the OS version on the device|
+|**initialize**|Requests and initialize the Scanwedge, this must be called before using the Scanwedge|
+|**isDeviceSupported**|Returns true if it's a supported device(Honeywell or Zebra), if this is false the other methods will be ignored when called|
 |**manufacturer**|Returns the manufacturer of the device|
+|**modelName**|Returns the modelname of the device|
+|**osVersion**|Returns the OS version on the device|
 |**packageName**|Returns the package name of the host application, this will also be used as default package name in [ScanProfile] if not set|
-|**isDeviceSupported**|Returns true if it's a Zebra device, if this is false no methods will be called on the device, replacing [isZebra]|
-
-
->Difference between enable/disable and suspend/resume is that enable/disable will work even if the scanner is ready but suspend/resume is much faster but will not work if scanner is not ready
+|**productName**|Returns the productname of the device|
+|**supportedDevice**|Returns a [SupportedDevice] object with the information if the device is supported and the type|
+|**stream**|Request a stream of barcode scans, returns barcodes scanned with the [ScanResult]|
+|**toggleScanning**|Triggers a scan (SOFTTRIGGER)|
 
 &nbsp;
 
 ### Creating a new basic profile
 ```dart
-final _scanwedgePlugin = Scanwedge();
+final _scanwedgePlugin = await Scanwedge.initialize();
 
-//[profileName] will be the name of the profile, [packageName] is optional and the packageName of the host application to receive the intent
-final newProfile=ScanProfile(profileName: 'TestProfile', disableKeystroke: true, packageName: 'no.talgoe.scanwedge.scanwedge_example')
-_scanwedgePlugin.createProfile(newProfile)
+//Creating a new profile with the name TestProfile that only reads CODE128 barcodes with the length between 5 and 10
+_scanwedgePlugin.createProfile(ProfileModel(profileName: 'TestProfile', enabledBarcodes: [BarcodeTypes.code128.create(minLength: 5, maxLength: 10)]))
 ```
 
-### ScanProfile
-This class can modify the profile that will be created
+### ProfileModel
+This class sets the scan profile
 ```dart
-ScanProfile({
-    required this.profileName,                      // The name of the profile
-    this.configMode = ProfileCreateType.update,     // update, createIfNotExist, overwrite
-    this.disableKeystroke = false,                  // disable sending scans to keyboard buffer
-    this.barcodePlugin = BarcodePlugin(),           // See [BarcodePlugin]
-    required this.packageName,                      // The packageName of your application.
+ProfileModel({
+    required String profileName,                      // The name of the profile
+    List<BarcodeConfig>? enabledBarcodes,             // A list of [BarcodeConfig] that will be enabled in the profile
+    bool keepDefaults = true,                         // If true, the default enabled barcodes from the hardware used will be kept (together with [enabledBarcodes])
 });
 ```
 
-### BarcodePlugin
-Possibility to set configuration related to barcode scanning.
-This will later have the possibility to enable/disable different barcodetypes
+### ZebraProfileModel
+This class is a extended version of [ProfileModel] that adds more configuration options if the device is a Zebra device (will also work with other devices but then ignore the extra configuration)
+The extra options are:
+[aimType] - The type of aim, see [AimTypes], default is [AimType.trigger]
+[enableKeyStroke] - Enable sending scans to keyboard buffer (this is default set to false)
+
+### HoneywellProfileModel
+This currently have no extra configuration options, so should use [ProfileModel] instead
+
+### SupportedDevice
+This class is returned when calling [supportedDevice]
 ```dart
-BarcodePlugin({
-    this.aimType = AimType.trigger,   // See [AimTypes]
-    this.timeoutBetweenScans = 0,     // 0-5000 ms. Time between reading barcodes (for [AimType.presentation])
-    this.disabledBarcodes,            // A list of BarcodeLabelType that will be disabled in the profile
-    this.enabledBarcodes,             // A list of BarcodeLabelType that will be enabled in the profile
+enum SupportedDevice { zebra, honeywell, invalid }
+```
+
+### BarcodeConfig
+Possibility to set configuration related to barcode scanning.
+```dart
+BarcodeConfig({
+    required BarcodeTypes barcodeType,  // The [BarcodeTypes]
+    int? minLength,                     // The minimum length of the barcode, ignored if null. Not all barcode types support this so check hardware vendor for the appropriate barcode type
+    int? maxLength,                     // The maximum length of the barcode, ignored if null. Not all barcode types support this so check hardware vendor for the appropriate barcode type
 });
 ```
 ### Listening for scan events
@@ -86,6 +94,7 @@ final _scanwedgePlugin=ScanwedgeChannel();
 ```
 
 #### AimTypes
+This is a enum that sets the aim type for the scanner on Zebra devices
 ```dart
 trigger
 timedHold
@@ -98,64 +107,25 @@ pressAndContinue
 timedContinuous
 ```
 
-#### BarcodeLabelType
+#### BarcodeTypes
 ````dart
-  labelTypeCode39,
-  labelTypeCodabar,
-  labelTypeCode128,
-  labelTypeD2of5,
-  labelTypeIata2of5,
-  labelTypeI2of5,
-  labelTypeCode93,
-  labelTypeUpca,
-  labelTypeUpce0,
-  labelTypeUpce1,
-  labelTypeEan8,
-  labelTypeEan13,
-  labelTypeMsi,
-  labelTypeEan128,
-  labelTypeTrioptic39,
-  labelTypeBookland,
-  labelTypeCoupon,
-  labelTypeDatabarCoupon,
-  labelTypeIsbt128,
-  labelTypeCode32,
-  labelTypePdf417,
-  labelTypeMicropdf,
-  labelTypeTlc39,
-  labelTypeCode11,
-  labelTypeMaxicode,
-  labelTypeDatamatrix,
-  labelTypeQrcode,
-  labelTypeGs1Databar,
-  labelTypeGs1DatabarLim,
-  labelTypeGs1DatabarExp,
-  labelTypeUspostnet,
-  labelTypeUsplanet,
-  labelTypeUkpostal,
-  labelTypeJappostal,
-  labelTypeAuspostal,
-  labelTypeDutchpostal,
-  labelTypeFinnishpostal4s,
-  labelTypeCanpostal,
-  labelTypeChinese2of5,
-  labelTypeAztec,
-  labelTypeMicroqr,
-  labelTypeUs4state,
-  labelTypeUs4stateFics,
-  labelTypeCompositeAb,
-  labelTypeCompositeC,
-  labelTypeWebcode,
-  labelTypeSignature,
-  labelTypeKorean3of5,
-  labelTypeMatrix2of5,
-  labelTypeOcr,
-  labelTypeHanxin,
-  labelTypeMailmark,
-  multicodeDataFormat,
-  labelTypeGs1Datamatrix,
-  labelTypeGs1Qrcode,
-  labelTypeDotcode,
-  labelTypeGridmatrix,
-  labelTypeUndefined,
+aztec,
+codabar,
+code128,
+code39,
+code93,
+datamatrix,
+ean128,
+ean13,
+ean8,
+gs1DataBar,
+gs1DataBarExpanded,
+i2of5,
+mailmark,
+maxicode,
+pdf417,
+qrCode,
+upca,
+upce0,
+unknown     // This is when it receives a unknown barcode, then check the [ScanResult.hardwareBarcodeType] for the actual barcode type
 ````

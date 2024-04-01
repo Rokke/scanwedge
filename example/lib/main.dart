@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:commonui/commonui.dart';
 import 'package:flutter/material.dart';
-import 'package:scanwedge/models/barcode_plugin.dart';
 import 'package:scanwedge/scanwedge.dart';
 
 void main() {
@@ -27,19 +26,41 @@ class _MyAppState extends State<MyApp> with ClassLogger {
   @override
   void initState() {
     super.initState();
-    Scanwedge.initialize().then((scanwedge) {
-      _scanwedgePlugin = scanwedge;
-      setState(() {});
-      scanwedge.getDeviceInfo().then((devInfo) => setState(() {
-            _deviceInfo = devInfo;
-          }));
-    });
+    try {
+      Scanwedge.initialize().then((scanwedge) {
+        _scanwedgePlugin = scanwedge;
+        setState(() {});
+        scanwedge.getDeviceInfo().then((devInfo) => setState(() {
+              _deviceInfo = devInfo;
+            }));
+      });
+    } catch (e) {
+      log('initState Exception: $e');
+    }
   }
 
   _createProfile() async {
-    log('_createProfile()-${await _scanwedgePlugin?.createScanProfile(ScanProfile(profileName: 'TestProfile', disableKeystroke: notifierDisableKeystroke.value, packageNames: [
-          'no.talgoe.scanwedge.scanwedge_example'
-        ], barcodePlugin: BarcodePlugin(aimType: notifierAimType.value)))}');
+    try {
+      log('_createProfile()-${await _scanwedgePlugin?.createScanProfile(_scanwedgePlugin?.manufacturer == 'ZEBRA' ? ZebraProfileModel(profileName: 'DemoProfile', enabledBarcodes: [
+            BarcodeConfig(barcodeType: BarcodeTypes.code39),
+            BarcodeConfig(barcodeType: BarcodeTypes.code128),
+            BarcodeConfig(barcodeType: BarcodeTypes.ean8),
+            BarcodeConfig(barcodeType: BarcodeTypes.ean13),
+            BarcodeConfig(barcodeType: BarcodeTypes.i2of5),
+          ], enableKeyStroke: !notifierDisableKeystroke.value, aimType: notifierAimType.value) : ProfileModel(profileName: 'DemoProfile', enabledBarcodes: [
+              BarcodeTypes.code128.create(),
+            ]))}');
+    } catch (e) {
+      log('_createProfile Exception: $e');
+    }
+  }
+
+  _triggerScan() async {
+    try {
+      log('_triggerScan()-${await _scanwedgePlugin?.toggleScanning()}');
+    } catch (e) {
+      log('_triggerScan Exception: $e');
+    }
   }
 
   @override
@@ -50,16 +71,33 @@ class _MyAppState extends State<MyApp> with ClassLogger {
         appBar: AppBar(
           title: const Text('Plugin example app'),
           actions: [
-            IconButton(
-                onPressed: () => debugPrint('${BarcodePlugin(disabledBarcodes: [
-                          BarcodeLabelType.labelTypeCode11,
-                          BarcodeLabelType.labelTypeCode128
-                        ], enabledBarcodes: [
-                          BarcodeLabelType.labelTypeCode39,
-                          BarcodeLabelType.labelTypeCode93
-                        ])..toMap}'),
-                icon: const Icon(Icons.bathtub)),
-            IconButton(onPressed: () => exit(0), icon: const Icon(Icons.exit_to_app)),
+            PopupMenuButton(
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'trigger',
+                  child: Text('Trigger scan'),
+                ),
+                const PopupMenuItem(
+                  value: 'enable',
+                  child: Text('Enable scanner'),
+                ),
+                const PopupMenuItem(
+                  value: 'disable',
+                  child: Text('Disable scanner'),
+                ),
+                const PopupMenuItem(
+                  value: 'exit',
+                  child: Text('Exit application'),
+                ),
+              ],
+              onSelected: (value) => switch (value) {
+                'trigger' => _triggerScan(),
+                'enable' => _scanwedgePlugin?.enableScanner(),
+                'disable' => _scanwedgePlugin?.disableScanner(),
+                'exit' => exit(0),
+                _ => null,
+              },
+            ),
           ],
         ),
         body: Column(

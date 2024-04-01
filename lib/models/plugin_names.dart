@@ -1,3 +1,4 @@
+@Deprecated('This will be removed later')
 abstract class PluginNames {
   static const barcode = 'BARCODE';
   static const msr = 'MSR'; // (Magnetic Stripe Reader) input

@@ -5,6 +5,7 @@ import 'package:scanwedge/models/barcode_plugin.dart';
 import 'package:scanwedge/scancommands.dart';
 import 'package:scanwedge/scanwedge_channel.dart';
 
+@Deprecated('This is for backwards compatibility, use [ProfileModel] instead')
 class ScanProfile {
   final bool disableKeystroke;
   final String profileName;
@@ -73,6 +74,7 @@ class ScanProfile {
       {'PROFILE_NAME': profileName, 'PROFILE_ENABLED': 'true', 'CONFIG_MODE': configMode, childKeyName: child};
 }
 
+@Deprecated('This is for backwards compatibility and will be removed later')
 abstract class ProfileCreateType {
   static const update = 'UPDATE';
   static const createIfNotExist = 'CREATE_IF_NOT_EXIST';

@@ -18,10 +18,16 @@ import no.talgoe.scanwedge.scanwedge.IHardwarePlugin
 import no.talgoe.scanwedge.scanwedge.ZebraPlugin
 import no.talgoe.scanwedge.scanwedge.Logger
 
+interface IScanHandler {
+  fun sendScanResult(scanResult: ScanResult)
+  fun sendBroadcast(intent: Intent)
+  fun sendResult(data: Any?)
+  fun getPackageName(): String
+}
+
 /** ScanwedgePlugin */
-class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallHandler {
+class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallHandler, IScanHandler {
   companion object {
-    // private val SCANWEDGE_ACTION="no.talgoe.scanwedge.scanwedge.SCAN"
     val SCANWEDGE_ACTION="no.mobcon.scanwedge.SCAN"
   }
   private val TAG="DataWedgePlugin"
@@ -29,13 +35,27 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
   private var context: Context?=null
   private lateinit var dataWedgeBroadcastReceiver: BroadcastReceiver
   private var hardwarePlugin: IHardwarePlugin?=null
-
+  override fun sendScanResult(scanResult: ScanResult){
+    log?.i(TAG, "sendScanResult: $scanResult")
+    channel.invokeMethod("scan", scanResult.toMap())
+  }
+  override fun sendResult(json: Any?){
+    log?.i(TAG, "sendResult: $json")
+    channel.invokeMethod("result", json)
+  }
+  override fun getPackageName(): String{
+    return context?.getPackageName()?:""
+  }
+  override fun sendBroadcast(intent: Intent){
+    log?.i(TAG, "sendBroadcast: ${intent.toUri(0)}")
+    context?.sendBroadcast(intent)
+  }
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+    log=AndroidLogger()
     log?.d(TAG, "onAttachedToEngine-Start")
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "scanwedge")
     channel.setMethodCallHandler(this)
     context=flutterPluginBinding.applicationContext
-    // hardwarePlugin=ZebraPlugin(context, channel)
   }
   override fun onMethodCall(call: MethodCall, result: Result) {
     log?.d(TAG, "onMethodCall: ${call.method}, ${call.arguments}")
@@ -44,22 +64,48 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
     }else if(call.method == "toggleScanning"){
       hardwarePlugin?.toggleScanning()
       result.success(true)
+    }else if(call.method == "enableScanner"){
+      result.success(hardwarePlugin?.enableScanner())
+    }else if(call.method == "disableScanner"){
+      result.success(hardwarePlugin?.disableScanner())
     }else if(call.method == "createProfile"){
       val argument=call.arguments
-        @Suppress("UNCHECKED_CAST")
-        val config = argument as HashMap<String, Any>?
-        if(config!=null){
-          hardwarePlugin?.createProfile(config)
-          result.success(true)
-        }else{
-          log?.e(TAG, "createProfile: Invalid config")
-          result.error("INVALID_INPUTPARAMETERS", "Must provide a config", "Invalid config")
+      @Suppress("UNCHECKED_CAST")
+      val config = argument as HashMap<String, Any>?
+      if(config!=null){
+        val barcodeList=ArrayList<BarcodePlugin>()
+        if(config["barcodes"] is List<*>){
+          val barcodes=config["barcodes"] as List<HashMap<String, Any>>
+          log?.i(TAG, "createProfile: barcodes: $barcodes")
+          // convert the list of barcodes to a list of BarcodePlugin
+          for(barcode in barcodes){
+            val barcodePlugin=BarcodePlugin.createBarcodePlugin(barcode)
+            if(barcodePlugin!=null) barcodeList.add(barcodePlugin)
+          }
         }
+        hardwarePlugin?.createProfile(config["name"] as String, barcodeList, config!!["hwConfig"] as? HashMap<String, Any>, config["keepDefaults"] as Boolean? ?: true)
+        result.success(true)
+      }else{
+        log?.e(TAG, "createProfile: Invalid config")
+        result.error("INVALID_INPUTPARAMETERS", "Must provide a config", "Invalid config")
+      }
+    }else if(call.method=="initializeDataWedge"){
+      // Checking if the device is a Zebra device. Checking that Build.MANUFACTURER or Build.MODEL starts with 'ZEBRA' using uppercase letters.
+      log?.i(TAG, "isSupported-manufacturer: ${android.os.Build.MANUFACTURER}, model: ${android.os.Build.MODEL}")
+      if(android.os.Build.MANUFACTURER!=null){
+        val manufacturer=android.os.Build.MANUFACTURER.uppercase().split(" ")[0]
+        // update hardwarePlugin based on manufacturer string
+        hardwarePlugin=if(manufacturer=="ZEBRA") ZebraPlugin(this, log) else if(manufacturer=="HONEYWELL") HoneywellPlugin(this, log) else null
+        hardwarePlugin?.initialize(context)
+        log?.i(TAG, "initializeDataWedge: ${hardwarePlugin?.javaClass?.name}")
+        result.success("${hardwarePlugin?.apiVersion}|${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}|${context?.getPackageName()}")
+      }else{
+        result.error("MANUFACTURER_NOT_FOUND", "Manufacturer not found", "Manufacturer not found")
+      }
     }else if(call.method=="sendCommand"){
       if(hardwarePlugin is ZebraPlugin){
         val command=call.argument<String>("command")
         val parameter=call.argument<String>("parameter")
-        // log?.i(TAG, "onMethodCall: sendCommand($command, $parameter)")
         val zebraPlugin=hardwarePlugin as ZebraPlugin
         result.success(zebraPlugin.sendCommand(command!!, parameter!!))
       }else{
@@ -82,53 +128,11 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
         log?.e(TAG, "sendCommandBundle: hardwarePlugin is wrong type: ${hardwarePlugin?.javaClass?.name}")
         result.error("HARDWARE_NOT_SUPPORTED", "Hardware not supported", "Hardware not supported")
       }
-    }else if(call.method=="initializeDataWedge"){
-      // Checking if the device is a Zebra device. Checking that Build.MANUFACTURER or Build.MODEL starts with 'ZEBRA' using uppercase letters.
-      log?.i(TAG, "isSupported-manufacturer: ${android.os.Build.MANUFACTURER}, model: ${android.os.Build.MODEL}")
-      if(android.os.Build.MANUFACTURER!=null){
-        val manufacturer=android.os.Build.MANUFACTURER.uppercase().split(" ")[0]
-        // update hardwarePlugin based on manufacturer string
-        hardwarePlugin=if(manufacturer=="ZEBRA") ZebraPlugin(context, channel, log) else if(manufacturer=="HONEYWELL") HoneywellPlugin(context, channel, log) else null
-        log?.i(TAG, "initializeDataWedge: ${hardwarePlugin?.javaClass?.name}")
-        result.success(manufacturer)
-      }else{
-        log?.i(TAG, "initializeDataWedge: Build.MANUFACTURER is null so test: ${call.arguments}")
-        if(call.arguments=="HONEYWELL") hardwarePlugin=HoneywellPlugin(null, null, log)
-        log?.d(TAG, "initializeDataWedge: ${hardwarePlugin?.javaClass?.name}")
-        result.success("HONEYWELL")
-      }
-/*    }else if (call.method == "createProfile") {   // Not used anylonger
-      val profileName=call.argument<String>("profileName")
-      val packageName=call.argument<String>("packageName")
-      if(profileName!=null && packageName!=null){
-        createAndAssosiateProfile(profileName, packageName)
-        result.success(true)
-      }else{
-        log?.e(TAG, "Invalid profileName or packageName")
-        result.error("INVALID_INPUTPARAMETERS", "Must provide a profileName", "Invalid profile or package-Name")
-      }*/
     } else {
       log?.w(TAG, "onMethodCall: notImplemented(${call.method})")
       result.notImplemented()
     }
   }
-  // fun createAndAssosiateProfile(profileName: String, packageName: String){
-  //   log?.i(TAG, "createAndAssosiateProfile($profileName)")
-  //   val dwIntent=Intent()
-  //   val bundle=Bundle()
-  //   bundle.putString("CREATE_PROFILE", profileName)
-  //   dwIntent.putExtra("com.symbol.datawedge.api.CREATE_PROFILE", bundle)
-  //   context.sendBroadcast(dwIntent)
-  //   val dwIntentConfig=Intent()
-  //   val profileConfig = Bundle()
-  //   profileConfig.putString("PROFILE_NAME", profileName)
-  //   profileConfig.putString("PROFILE_ENABLED", "true")
-  //   profileConfig.putString("CONFIG_MODE", "UPDATE")
-  //   profileConfig.putParcelableArray("APP_LIST", createIntent(packageName))
-  //   log?.i(TAG, "createAndAssosiateProfile-$profileConfig")
-  //   dwIntentConfig.putExtra("com.symbol.datawedge.api.SET_CONFIG", profileConfig)
-  //   context.sendBroadcast(dwIntentConfig)
-  // }
   fun createIntent(packageName:String):Array<Bundle>{
     log?.i(TAG, "createIntent($packageName)")
     val bundle=Bundle()
@@ -138,6 +142,7 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    hardwarePlugin?.dispose(context)
     channel.setMethodCallHandler(null)
   }
 }

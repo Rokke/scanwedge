@@ -38,9 +38,3 @@ class TestLogger : Logger {
         println("\u001b[41m\u001b[37m\u001b[1m[ERR]\u001b[0m $tag: $message")
     }
 }
-/*Level.fatal => '\u001b[41m\u001b[37m\u001b[1m',
-              Level.error => '',
-              Level.warning => '',
-              Level.info => '',
-              _ => ''
-            }}${event.level.name}' */

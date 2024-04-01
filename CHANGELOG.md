@@ -15,4 +15,5 @@
 * Updated packaged and Dart SDK
 
 ## 0.1.0+6
-* Fixed creation of APP_LIST and PLUGIN_CONFIG
+* Refactored most classes to be more generic and support several hardware types
+* You should now instead use the createProfile function with the [ProfileModel] to create a profile

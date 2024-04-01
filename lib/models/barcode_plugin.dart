@@ -1,5 +1,6 @@
 import 'package:scanwedge/scanwedge.dart';
 
+@Deprecated('This is for backwards compatibility, use [BarcodeConfig] instead')
 class BarcodePlugin {
   final AimType aimType;
   final int timeoutBetweenScans;
@@ -25,6 +26,7 @@ class BarcodePlugin {
   toString() => toMap.toString();
 }
 
+@Deprecated('This is for backwards compatibility, use [BarcodeConfig] instead')
 class BarcodeConfiguration {
   final List<BarcodeLabelType> barcodes;
   BarcodeConfiguration({required this.barcodes});

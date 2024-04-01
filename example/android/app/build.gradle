@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace = "no.mobcon.talgoe.scanwedge_example"
+    namespace = "no.talgoe.scanwedge.scanwedge_example"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
     compileOptions {

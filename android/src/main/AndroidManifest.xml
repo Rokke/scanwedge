@@ -9,6 +9,7 @@
         <intent-filter>
             <action android:name="com.symbol.datawedge.api.ACTION" />
             <action android:name="com.honeywell.aidc.action.ACTION_CLAIM_SCANNER" />
+            <action android:name="no.mobcon.scanwedge.SCAN" />
             <!-- <action android:name="no.talgoe.scanwedge.scanwedge.SCAN" /> -->
         </intent-filter>
     </receiver>
