@@ -78,12 +78,24 @@ class HoneywellPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
     }
     override fun disableScanner():Boolean{
       log?.w(TAG, "disableScanner")
-      scanW.sendBroadcast(Intent(ACTION_RELEASE_SCANNER).apply{ setPackage("com.intermec.datacollectionservice") })
+      scanW.sendBroadcast(Intent(ACTION_CLAIM_SCANNER).apply{
+        setPackage("com.intermec.datacollectionservice")
+        putExtra(EXTRA_PROPERTIES, Bundle().apply{
+          putBoolean("TRIG_ENABLE", false)
+        })
+      })
+      // scanW.sendBroadcast(Intent(ACTION_RELEASE_SCANNER).apply{ setPackage("com.intermec.datacollectionservice") })
       return true
     }
     override fun enableScanner():Boolean{
       log?.w(TAG, "enableScanner")
-      scanW.sendBroadcast(Intent(ACTION_CLAIM_SCANNER).apply{ setPackage("com.intermec.datacollectionservice") })
+      scanW.sendBroadcast(Intent(ACTION_CLAIM_SCANNER).apply{
+        setPackage("com.intermec.datacollectionservice")
+        putExtra(EXTRA_PROPERTIES, Bundle().apply{
+          putBoolean("TRIG_ENABLE", true)
+        })
+      })
+      // scanW.sendBroadcast(Intent(ACTION_CLAIM_SCANNER).apply{ setPackage("com.intermec.datacollectionservice") })
       return true
     }
     // override fun enableScanner():Boolean{

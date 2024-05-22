@@ -15,5 +15,11 @@
 * Updated packaged and Dart SDK
 
 ## 0.1.0+6
+* Fixed setting correct package name
+
+## 1.0.0-beta.1
 * Refactored most classes to be more generic and support several hardware types
 * You should now instead use the createProfile function with the [ProfileModel] to create a profile
+
+## 1.0.0-beta.2
+* Fixed so that disable scanner on Honeywell also disable the scanner from working

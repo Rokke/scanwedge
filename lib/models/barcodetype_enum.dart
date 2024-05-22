@@ -18,6 +18,7 @@ enum BarcodeTypes {
   upca,
   upce0,
   unknown,
+  manual,
   ;
 
   BarcodeConfig create({int? minLength, int? maxLength}) => BarcodeConfig(barcodeType: this, minLength: minLength, maxLength: maxLength);
