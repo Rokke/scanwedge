@@ -13,15 +13,15 @@ class ScanwedgeChannel {
   static const _methodChannel = MethodChannel(channel);
   final _streamController = StreamController<ScanResult>.broadcast();
   final SupportedDevice supportedDevice;
-  final String manufacturer, modelName, productName, osVersion, packageName;
+  final String manufacturer, modelName, productName, osVersion, packageName, deviceName;
   String? _lastCompleterError;
   Completer<String>? completerSendCommandBundle;
   @Deprecated('This is for backwards compatibility, use isDeviceSupported instead')
   bool get isZebra => isDeviceSupported;
   bool get isDeviceSupported => supportedDevice != SupportedDevice.invalid;
-  ScanwedgeChannel._({required this.supportedDevice, this.manufacturer = '', this.modelName = '', this.productName = '', this.osVersion = '', this.packageName = ''}) {
+  ScanwedgeChannel._({required this.supportedDevice, this.manufacturer = '', this.modelName = '', this.productName = '', this.osVersion = '', this.packageName = '', this.deviceName = ''}) {
     _methodChannel.setMethodCallHandler(_methodHandler);
-    debugPrint('Scanwedge: $supportedDevice');
+    debugPrint('Scanwedge: $supportedDevice, $deviceName');
   }
   Stream<ScanResult> get stream => _streamController.stream;
 
@@ -31,16 +31,19 @@ class ScanwedgeChannel {
     try {
       if (!kIsWeb && Platform.isAndroid) {
         final supportedResponse = await _methodChannel.invokeMethod<String>('initializeDataWedge');
+        debugPrint('initializeDataWedge: $supportedResponse');
         if (supportedResponse != null) {
           final devInfoString = supportedResponse.split('|');
-          if (devInfoString.length > 4) {
+          if (devInfoString.length > 5) {
             return ScanwedgeChannel._(
-                supportedDevice: _fetchSupportedDevice(devInfoString[0]),
-                manufacturer: devInfoString[1],
-                modelName: devInfoString[2],
-                productName: devInfoString[3],
-                osVersion: devInfoString[4],
-                packageName: devInfoString[5]);
+              supportedDevice: _fetchSupportedDevice(devInfoString[0]),
+              manufacturer: devInfoString[1],
+              modelName: devInfoString[2],
+              productName: devInfoString[3],
+              osVersion: devInfoString[4],
+              packageName: devInfoString[5],
+              deviceName: devInfoString[6],
+            );
           }
         }
       }

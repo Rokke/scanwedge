@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Parcelable
+import android.provider.Settings
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
@@ -60,7 +61,7 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
   override fun onMethodCall(call: MethodCall, result: Result) {
     log?.d(TAG, "onMethodCall: ${call.method}, ${call.arguments}")
     if (call.method == "getDeviceInfo") {
-      result.success("${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}|${context?.getPackageName()}")
+      result.success("${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}|${context?.getPackageName()}|${Settings.Global.getString(context?.contentResolver, Settings.Global.DEVICE_NAME)}")
     }else if(call.method == "toggleScanning"){
       hardwarePlugin?.toggleScanning()
       result.success(true)
@@ -98,7 +99,7 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
         hardwarePlugin=if(manufacturer=="ZEBRA") ZebraPlugin(this, log) else if(manufacturer=="HONEYWELL") HoneywellPlugin(this, log) else null
         hardwarePlugin?.initialize(context)
         log?.i(TAG, "initializeDataWedge: ${hardwarePlugin?.javaClass?.name}")
-        result.success("${hardwarePlugin?.apiVersion}|${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}|${context?.getPackageName()}")
+        result.success("${hardwarePlugin?.apiVersion}|${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}|${context?.getPackageName()}|${Settings.Global.getString(context?.contentResolver, Settings.Global.DEVICE_NAME)}")
       }else{
         result.error("MANUFACTURER_NOT_FOUND", "Manufacturer not found", "Manufacturer not found")
       }

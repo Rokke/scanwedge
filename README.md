@@ -127,5 +127,6 @@ pdf417,
 qrCode,
 upca,
 upce0,
+manual,     // Used for marking a barcode as manual input
 unknown     // This is when it receives a unknown barcode, then check the [ScanResult.hardwareBarcodeType] for the actual barcode type
 ````

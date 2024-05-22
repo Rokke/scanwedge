@@ -23,3 +23,4 @@
 
 ## 1.0.0-beta.2
 * Fixed so that disable scanner on Honeywell also disable the scanner from working
+* Added deviceName as property to the [ScanwedgeChannel]
