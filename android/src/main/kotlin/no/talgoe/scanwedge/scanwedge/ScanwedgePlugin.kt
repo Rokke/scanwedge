@@ -157,7 +157,11 @@ class ScanwedgePlugin: FlutterPlugin, MethodCallHandler {
     val bundle=Bundle()
     for((key,value) in parameter){
       val value=parameter[key]
-      if(value is String){
+      if(value is Int){
+        // if(key.equals("APP_LIST")) bundle.putParcelableArray("APP_LIST", createIntent(value))
+        // Log.d(TAG, "putString: $key => $value")
+        bundle.putString(key, value)
+      }else if(value is String){
         // if(key.equals("APP_LIST")) bundle.putParcelableArray("APP_LIST", createIntent(value))
         // Log.d(TAG, "putString: $key => $value")
         bundle.putString(key, value)

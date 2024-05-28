@@ -37,6 +37,10 @@ class ScanProfile {
           'PARAM_LIST': {'keystroke_output_enabled': (!disableKeystroke).toString()},
           'PLUGIN_NAME': 'KEYSTROKE'
         },
+        {
+          'PARAM_LIST': {'inverse_1d_mode': 3},
+          'PLUGIN_NAME': 'KEYSTROKE'
+        },
         if (barcodePlugin != null) barcodePlugin!.toMap,
         if (optionalMap != null) optionalMap!,
         if (profileIntentAction != null)
@@ -58,7 +62,8 @@ class ScanProfile {
           .toList(),
       'RESET_CONFIG': 'true'
     };
-    final result = await scanWedge.sendCommandBundle(command: ScanCommands.datawedgeSendSetConfig, parameter: json, sendResult: true);
+    final result =
+        await scanWedge.sendCommandBundle(command: ScanCommands.datawedgeSendSetConfig, parameter: json, sendResult: true);
     log('ScanProfile: ${jsonEncode(json)}-$result');
     return result;
   }
