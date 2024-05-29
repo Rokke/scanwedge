@@ -8,6 +8,8 @@ export 'package:scanwedge/models/plugin_names.dart';
 export 'package:scanwedge/models/scanprofile.dart';
 export 'package:scanwedge/models/scanresult.dart';
 
+// DOCS: https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig/
+
 class Scanwedge {
   final ScanwedgeChannel _scanwedgeChannel;
   Scanwedge._(this._scanwedgeChannel);
@@ -46,24 +48,29 @@ class Scanwedge {
   Future<bool> toggleScanning() => _scanwedgeChannel.toggleScanning();
 
   /// Disables the DataWedge scanprofile
-  Future<void> disableScanner() => _scanwedgeChannel.sendCommand(command: ScanCommands.scannerInputPlugin, parameter: 'DISABLE_PLUGIN');
+  Future<void> disableScanner() =>
+      _scanwedgeChannel.sendCommand(command: ScanCommands.scannerInputPlugin, parameter: 'DISABLE_PLUGIN');
 
   /// Enable the DataWedge scanprofile
-  Future<void> enableScanner() => _scanwedgeChannel.sendCommand(command: ScanCommands.scannerInputPlugin, parameter: 'ENABLE_PLUGIN');
+  Future<void> enableScanner() =>
+      _scanwedgeChannel.sendCommand(command: ScanCommands.scannerInputPlugin, parameter: 'ENABLE_PLUGIN');
 
   /// Suspends the DataWedge scanprofile, this is quicker than the [disableScanner]
-  Future<void> suspendScanner() => _scanwedgeChannel.sendCommand(command: ScanCommands.scannerInputPlugin, parameter: 'SUSPEND_PLUGIN');
+  Future<void> suspendScanner() =>
+      _scanwedgeChannel.sendCommand(command: ScanCommands.scannerInputPlugin, parameter: 'SUSPEND_PLUGIN');
   Future<String?> getDeviceInfo() => _scanwedgeChannel.getDeviceInfo();
 
   /// Resumes the DataWedge scanprofile, this is quicker than the [enableScanner]
-  Future<void> resumeScanner() => _scanwedgeChannel.sendCommand(command: ScanCommands.scannerInputPlugin, parameter: 'RESUME_PLUGIN');
+  Future<void> resumeScanner() =>
+      _scanwedgeChannel.sendCommand(command: ScanCommands.scannerInputPlugin, parameter: 'RESUME_PLUGIN');
 
   /// Send basic simple commands to the DataWedge
   /// [command] is the command to be used
   /// [parameter] is the parameter to set for the [command]
   ///
   /// For more info on the commands go to <https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig>
-  Future<bool> sendCommand({required String command, required String parameter}) => _scanwedgeChannel.sendCommand(command: command, parameter: parameter);
+  Future<bool> sendCommand({required String command, required String parameter}) =>
+      _scanwedgeChannel.sendCommand(command: command, parameter: parameter);
 
   /// Send bundled commands to the DataWedge
   /// [command] command to be used
