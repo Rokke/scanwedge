@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
@@ -40,6 +41,9 @@ class Scanwedge {
   /// Gives the Android OS version that the device runs on. Example '10'
   String get osVersion => _scanwedgeChannel.osVersion;
 
+  /// Gives the device name of the device it runs on. Example 'My Device'
+  String get deviceName => Platform.isAndroid ? _scanwedgeChannel.deviceName : Platform.localHostname;
+
   /// Returns the supported device as a [SupportedDevice] enum
   /// This can be used to check if the device is supported and what type of device it is
   SupportedDevice get supportedDevice => _scanwedgeChannel.supportedDevice;
@@ -51,7 +55,7 @@ class Scanwedge {
   /// [profile] is the name for the package that will be visible in the profile list on the device.
   /// [packageName] inside the [ScanProfile] is optional and if omitted the packageName for this host application will be used witch is mostly what you want.
   /// If you want to use this application only to create profile for some other application, then you should use that applications package name instead
-  @Deprecated('This is for backwards compatibility, use [createScanProfile] instead, honeywell will throw exception is this is called')
+  @Deprecated('This is for backwards compatibility, use [createScanProfile] instead, honeywell will throw exception if this is called')
   Future<bool> createProfile(ScanProfile profile) => switch (_scanwedgeChannel.supportedDevice) {
         // SupportedDevice.honeywell => createScanProfile(profile),
         SupportedDevice.zebra => profile.sendCommands(_scanwedgeChannel),
