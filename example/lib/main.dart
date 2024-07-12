@@ -35,9 +35,17 @@ class _MyAppState extends State<MyApp> {
   }
 
   _createProfile() async {
-    log('_createProfile()-${await _scanwedgePlugin?.createProfile(ScanProfile(profileName: 'TestProfile', disableKeystroke: notifierDisableKeystroke.value, packageNames: [
-          'no.talgoe.scanwedge.scanwedge_example'
-        ], barcodePlugin: BarcodePlugin(aimType: notifierAimType.value)))}');
+    log('_createProfile()-${await _scanwedgePlugin?.createProfile(
+      ScanProfile(
+        profileName: 'TestProfile',
+        disableKeystroke: notifierDisableKeystroke.value,
+        packageNames: ['no.talgoe.scanwedge.scanwedge_example'],
+        barcodePlugin: BarcodePlugin(
+          aimType: notifierAimType.value,
+          // enabledBarcodes: [BarcodeLabelType.labelTypeCode39, BarcodeLabelType.labelTypeCode93],
+        ),
+      ),
+    )}');
   }
 
   @override
@@ -48,13 +56,10 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
           actions: [
             IconButton(
-                onPressed: () => debugPrint('${BarcodePlugin(disabledBarcodes: [
-                          BarcodeLabelType.labelTypeCode11,
-                          BarcodeLabelType.labelTypeCode128
-                        ], enabledBarcodes: [
-                          BarcodeLabelType.labelTypeCode39,
-                          BarcodeLabelType.labelTypeCode93
-                        ])..toMap}'),
+                onPressed: () => debugPrint('${BarcodePlugin(
+                      disabledBarcodes: [BarcodeLabelType.labelTypeCode11, BarcodeLabelType.labelTypeCode128],
+                      // enabledBarcodes: [BarcodeLabelType.labelTypeCode39, BarcodeLabelType.labelTypeCode93],
+                    )..toMap}'),
                 icon: const Icon(Icons.bathtub)),
             IconButton(onPressed: () => exit(0), icon: const Icon(Icons.exit_to_app)),
           ],
@@ -84,7 +89,8 @@ class _MyAppState extends State<MyApp> {
                             const SizedBox(width: 5),
                             ValueListenableBuilder(
                                 valueListenable: notifierDisableKeystroke,
-                                builder: (context, disableKeyboard, _) => Switch(value: disableKeyboard, onChanged: (value) => notifierDisableKeystroke.value = value)),
+                                builder: (context, disableKeyboard, _) =>
+                                    Switch(value: disableKeyboard, onChanged: (value) => notifierDisableKeystroke.value = value)),
                           ],
                         ),
                         ValueListenableBuilder(
@@ -101,15 +107,19 @@ class _MyAppState extends State<MyApp> {
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                                     decoration: BoxDecoration(
-                                        color: Colors.blue, borderRadius: BorderRadius.circular(5), boxShadow: const [BoxShadow(offset: Offset(2, 2), blurRadius: 1, color: Colors.black54)]),
+                                        color: Colors.blue,
+                                        borderRadius: BorderRadius.circular(5),
+                                        boxShadow: const [BoxShadow(offset: Offset(2, 2), blurRadius: 1, color: Colors.black54)]),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text('AimType:', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white)),
+                                        Text('AimType:',
+                                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white)),
                                         Padding(
                                           padding: const EdgeInsets.only(left: 6.0),
-                                          child: Text(aimType.toString().split('.').last, style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white)),
+                                          child: Text(aimType.toString().split('.').last,
+                                              style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white)),
                                         ),
                                       ],
                                     ),
@@ -124,7 +134,8 @@ class _MyAppState extends State<MyApp> {
               ),
             )),
             TextFormField(
-              decoration: const InputDecoration(hintText: 'auto inserted if keystroke and focused', contentPadding: EdgeInsets.symmetric(horizontal: 6)),
+              decoration: const InputDecoration(
+                  hintText: 'auto inserted if keystroke and focused', contentPadding: EdgeInsets.symmetric(horizontal: 6)),
             ),
             const Expanded(child: SizedBox()),
             Card(
