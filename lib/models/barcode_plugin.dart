@@ -11,6 +11,7 @@ class BarcodePlugin {
           'scanner_selection': 'auto',
           'scanner_input_enabled': 'true',
           'inverse_1d_mode': '2',
+          'decoder_upca_preamble': '2',
           'aim_type': AimType.values.indexOf(aimType).toString(),
           if (timeoutBetweenScans > 0) 'same_barcode_timeout': timeoutBetweenScans.toString(),
           ..._mapOfDisabledBarcodes,
@@ -31,8 +32,7 @@ class BarcodePlugin {
         ])
           'decoder_${fetchDecoderName(entry)}': 'true'
       };
-  static String fetchDecoderName(BarcodeLabelType barcodeLabelType) =>
-      barcodeLabelType.name.split('.').last.substring(9).toLowerCase();
+  static String fetchDecoderName(BarcodeLabelType barcodeLabelType) => barcodeLabelType.name.split('.').last.substring(9).toLowerCase();
   @override
   toString() => toMap.toString();
 }
