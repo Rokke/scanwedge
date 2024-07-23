@@ -1,5 +1,7 @@
 import 'package:scanwedge/scanwedge.dart';
 
+// DOCS
+// https://github.com/ltrudu/ZebraEntepriseServices/blob/e35cf2ef006c7d3fd1296312da8ab91aa7b5bdba/datawedgeprofileintentswrapper/src/main/java/com/zebra/datawedgeprofileintents/SettingsPlugins/PluginScanner.java#L186
 class BarcodePlugin {
   final AimType aimType;
   final int timeoutBetweenScans;
