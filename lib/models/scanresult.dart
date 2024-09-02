@@ -10,6 +10,8 @@ class ScanResult {
       barcode: json['barcode'],
       barcodeType: BarcodeTypes.values.firstWhere((element) => element.name == json['barcodeType'], orElse: () => BarcodeTypes.unknown),
       hardwareLabelType: json['hardwareLabelType']);
+  ScanResult copyWith({String? barcode, BarcodeTypes? barcodeType, String? hardwareLabelType}) =>
+      ScanResult(barcode: barcode ?? this.barcode, barcodeType: barcodeType ?? this.barcodeType, hardwareLabelType: hardwareLabelType ?? this.hardwareLabelType);
   @override
   String toString() => 'ScanResult($barcode:$barcodeType)';
 }
