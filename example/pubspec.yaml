@@ -6,8 +6,6 @@ environment:
   sdk: '>=3.4.0-190.1.beta <4.0.0'
 
 dependencies:
-  commonui:
-    path: ../../commonui
   flutter:
     sdk: flutter
 
