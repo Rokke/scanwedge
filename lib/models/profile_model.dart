@@ -17,6 +17,11 @@ class ProfileModel {
         if (!keepDefaults) 'keepDefaults': keepDefaults,
         'hwConfig': customMap,
       };
+  factory ProfileModel.fromMap(Map<String, dynamic> map) => ProfileModel(
+        profileName: map['name'],
+        enabledBarcodes: map['barcodes'] != null ? List<BarcodeConfig>.from(map['barcodes'].map((x) => BarcodeConfig.fromMap(x))) : null,
+        keepDefaults: map['keepDefaults'] ?? true,
+      );
 }
 
 /// HoneywellProfileModel class

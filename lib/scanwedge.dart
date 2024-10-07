@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:scanwedge/models/profile_model.dart';
@@ -99,6 +99,7 @@ class Scanwedge {
   /// [parameter] is the parameter to set for the [command]
   ///
   /// For more info on the commands go to <https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig>
+  @Deprecated('This is for backwards compatibility and only support Zebra devices, this will be removed later')
   Future<bool> sendCommand({required String command, required String parameter}) => _scanwedgeChannel.sendCommand(command: command, parameter: parameter);
 
   /// Send bundled commands to the DataWedge
@@ -114,6 +115,7 @@ class Scanwedge {
   /// });
   /// ```
   /// For more info on the commands go to <https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig>
+  @Deprecated('This is for backwards compatibility and only support Zebra devices, this will be removed later')
   Future<bool> sendCommandBundle({required String command, required Map<String, dynamic> parameter, bool sendResult = false}) =>
       _scanwedgeChannel.sendCommandBundle(command: command, parameter: parameter, sendResult: sendResult);
 }

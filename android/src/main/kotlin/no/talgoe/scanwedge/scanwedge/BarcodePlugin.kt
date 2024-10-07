@@ -51,4 +51,19 @@ class BarcodePlugin(public val type: BarcodeTypes, private val minLength: Int?, 
             Log.e("BarcodePlugin", "honeywellAddToBundle: Invalid barcode type: $type")
         }
     }
+    fun datalogicAddToList(lst: ArrayList<String>) {
+        val decoderName = type.datalogicDecoderName()
+        if(decoderName != null) {
+            Log.d("BarcodePlugin", "datalogicAddToList enable: $type, $decoderName")
+            lst.add("${decoderName}_ENABLE=true")
+            if(minLength != null) {
+                lst.add("${decoderName}_LENGTH1=$minLength")
+            }
+            if(maxLength != null) {
+                lst.add("${decoderName}_LENGTH2=$maxLength")
+            }
+        }else{
+            Log.e("BarcodePlugin", "datalogicAddToList: Invalid barcode type: $type")
+        }
+    }
 }

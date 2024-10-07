@@ -54,7 +54,9 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
         }
       }
     }
+    override val apiVersion: String get() = "ZEBRA"
     override fun initialize(context: Context?):Boolean{
+      log?.i(TAG, "ZebraPlugin")
       if(context!=null){
         try{
           val filter = IntentFilter()
@@ -76,21 +78,14 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
       }
       return false
     }
-    override val apiVersion: String get() = "ZEBRA"
+    override fun dispose(context: Context?) {
+      context?.unregisterReceiver(barcodeDataReceiver)
+    }
     override fun toggleScanning():Boolean {
       log?.i(TAG, "toggleScanning")
       scanW.sendBroadcast(Intent().apply{
         setAction("com.symbol.datawedge.api.ACTION")
         putExtra("com.symbol.datawedge.api.SOFT_SCAN_TRIGGER", "START_SCANNING")
-      })
-      return true
-    }
-    override fun enableScanner():Boolean {
-      log?.i(TAG, "enableScanner")
-      scanW.sendBroadcast(Intent().apply{
-        setAction("com.symbol.datawedge.api.ACTION")
-        putExtra("com.symbol.datawedge.api.SCANNER_INPUT_PLUGIN", "RESUME_PLUGIN")  // RESUME_PLUGIN is "faster" than ENABLE_PLUGIN
-        // putExtra("com.symbol.datawedge.api.SCANNER_INPUT_PLUGIN", "ENABLE_PLUGIN")
       })
       return true
     }
@@ -103,19 +98,14 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
       })
       return true
     }
-    private fun convertAimTypeToIndex(sAimType: String?):Int?{
-      return when(sAimType){
-        "trigger"->0
-        "timedHold"->1
-        "timedRelease"->2
-        "pressAndRelease"->3
-        "presentation"->4
-        "continuousRead"->5
-        "pressAndSustain"->6
-        "pressAndContinue"->7
-        "timedContinuous"->8
-        else->null
-      }
+    override fun enableScanner():Boolean {
+      log?.i(TAG, "enableScanner")
+      scanW.sendBroadcast(Intent().apply{
+        setAction("com.symbol.datawedge.api.ACTION")
+        putExtra("com.symbol.datawedge.api.SCANNER_INPUT_PLUGIN", "RESUME_PLUGIN")  // RESUME_PLUGIN is "faster" than ENABLE_PLUGIN
+        // putExtra("com.symbol.datawedge.api.SCANNER_INPUT_PLUGIN", "ENABLE_PLUGIN")
+      })
+      return true
     }
     override fun createProfile(name: String, enabledBarcodes: List<BarcodePlugin>?, hwConfig: HashMap<String,Any>?, keepDefaults: Boolean):Boolean {
       log?.i(TAG, "createProfile($name, $enabledBarcodes, $hwConfig, $keepDefaults)")
@@ -190,8 +180,19 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
       scanW.sendBroadcast(i)
       return true
     }
-    override fun dispose(context: Context?) {
-      context?.unregisterReceiver(barcodeDataReceiver)
+    private fun convertAimTypeToIndex(sAimType: String?):Int?{
+      return when(sAimType){
+        "trigger"->0
+        "timedHold"->1
+        "timedRelease"->2
+        "pressAndRelease"->3
+        "presentation"->4
+        "continuousRead"->5
+        "pressAndSustain"->6
+        "pressAndContinue"->7
+        "timedContinuous"->8
+        else->null
+      }
     }
     fun iterateIntent(parameter: Map<String,Any>):Bundle{
       val bundle=Bundle()

@@ -49,7 +49,15 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
   }
   override fun sendBroadcast(intent: Intent){
     log?.i(TAG, "sendBroadcast: ${intent.toUri(0)}")
-    context?.sendBroadcast(intent)
+    val resultReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val resultCode = resultCode
+            val resultData = resultData
+            val resultExtras = getResultExtras(true)
+            log?.i(TAG, "Broadcast result: code=$resultCode, data=$resultData, extras=$resultExtras")
+        }
+    }
+    context?.sendOrderedBroadcast(intent, null, resultReceiver, null, 0, null, null)
   }
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     log=AndroidLogger()
@@ -96,7 +104,7 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
       if(android.os.Build.MANUFACTURER!=null){
         val manufacturer=android.os.Build.MANUFACTURER.uppercase().split(" ")[0]
         // update hardwarePlugin based on manufacturer string
-        hardwarePlugin=if(manufacturer=="ZEBRA") ZebraPlugin(this, log) else if(manufacturer=="HONEYWELL") HoneywellPlugin(this, log) else null
+        hardwarePlugin=if(manufacturer=="ZEBRA") ZebraPlugin(this, log) else if(manufacturer=="HONEYWELL") HoneywellPlugin(this, log) else if(manufacturer=="DATALOGIC") DatalogicPlugin(this, log) else null
         hardwarePlugin?.initialize(context)
         log?.i(TAG, "initializeDataWedge: ${hardwarePlugin?.javaClass?.name}")
         result.success("${hardwarePlugin?.apiVersion}|${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}|${context?.getPackageName()}|${Settings.Global.getString(context?.contentResolver, Settings.Global.DEVICE_NAME)}")

@@ -30,6 +30,9 @@ enum class BarcodeTypes(val code: String) {
         fun honeywellDefaultTypes(): List<BarcodeTypes> {
             return listOf(AZTEC, CODABAR, CODE128, CODE39, DATAMATRIX, EAN8, EAN13, GS1_DATABAR, MAXICODE, PDF417, QRCODE, UPCA, UPCE0, EAN128, I2OF5, CODE93)
         }
+        fun datalogicDefaultTypes(): List<BarcodeTypes> {
+            return listOf(AZTEC, CODABAR, CODE128, CODE39, CODE93, DATAMATRIX, EAN8, EAN128, EAN13, GS1_DATABAR, MAXICODE, PDF417, QRCODE, UPCA, UPCE0, I2OF5)
+        }
         fun fromZebraCode(codeId: String?):BarcodeTypes{
             return when(codeId){
                 "LABEL-TYPE-AZTEC" -> BarcodeTypes.AZTEC
@@ -50,6 +53,28 @@ enum class BarcodeTypes(val code: String) {
                 "LABEL-TYPE-QRCODE" -> BarcodeTypes.QRCODE
                 "LABEL-TYPE-UPCA" -> BarcodeTypes.UPCA
                 "LABEL-TYPE-UPCE0" -> BarcodeTypes.UPCE0
+                else -> BarcodeTypes.UNKNOWN
+            }
+        }
+        fun fromDatalogicCode(codeId: String?):BarcodeTypes{
+            return when(codeId){
+                    "Aztec" -> BarcodeTypes.AZTEC
+                "Codabar" -> BarcodeTypes.CODABAR
+                    "Code 128" -> BarcodeTypes.CODE128
+                    "Code 39" -> BarcodeTypes.CODE39
+                    "Code 93" -> BarcodeTypes.CODE93
+                    "Data Matrix" -> BarcodeTypes.DATAMATRIX
+                    "EAN-8" -> BarcodeTypes.EAN8
+                    "GS1-128" -> BarcodeTypes.EAN128
+                    "EAN-13" -> BarcodeTypes.EAN13
+                    "GS1 DataBar-14" -> BarcodeTypes.GS1_DATABAR
+                    "GS1 DataBar Limited" -> BarcodeTypes.GS1_DATABAR
+                    "GS1 DataBar Expanded" -> BarcodeTypes.GS1_DATABAR_EXPANDED
+                    "Interleaved 2 of 5" -> BarcodeTypes.I2OF5
+                    "PDF417" -> BarcodeTypes.PDF417
+                    "QR Code" -> BarcodeTypes.QRCODE
+                    "UPC-A" -> BarcodeTypes.UPCA
+                    "UPC-E" -> BarcodeTypes.UPCE0
                 else -> BarcodeTypes.UNKNOWN
             }
         }
@@ -209,6 +234,27 @@ enum class BarcodeTypes(val code: String) {
             else -> null
         }
     }
+    fun datalogicDecoderName(): String?{
+        return when(this) {
+            AZTEC -> "AZTEC"
+            CODABAR -> "CODABAR"
+            CODE128 -> "CODE128"
+            CODE39 -> "CODE39"
+            CODE93 -> "CODE93"
+            DATAMATRIX -> "DATAMATRIX"
+            EAN8 -> "EAN8"
+            EAN13 -> "EAN13"
+            EAN128 -> "CODE128_GS1"
+            GS1_DATABAR -> "GS1_14"
+            I2OF5 -> "I25"
+            MAXICODE -> "MAXICODE"
+            PDF417 -> "PDF417"
+            QRCODE -> "QRCODE"
+            UPCA -> "UPCA"
+            UPCE0 -> "UPCE"
+            else -> null
+        }
+    }
     fun zebraDisableBarcode(bundle: Bundle) {
         val decoderName = zebraDecoderName()
         if(decoderName != null) {
@@ -225,6 +271,15 @@ enum class BarcodeTypes(val code: String) {
             bundle.putBoolean("${decoderName}_ENABLED", false)
         }else{
             Log.w("BarcodeTypes", "honeywellDisableBarcode: Invalid barcode type: $this")
+        }
+    }
+    fun datalogicDisableBarcode(lst: ArrayList<String>) {
+        Log.d("BarcodeTypes", "datalogicDisableBarcode: ${datalogicDecoderName()}=false")
+        val decoderName = datalogicDecoderName()
+        if(decoderName != null) {
+            lst.add("${decoderName}_ENABLE=false")
+        }else{
+            Log.w("BarcodeTypes", "datalogicDisableBarcode: Invalid barcode type: $this")
         }
     }
 }

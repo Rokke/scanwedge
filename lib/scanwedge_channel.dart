@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:scanwedge/scanwedge.dart';
 
-enum SupportedDevice { zebra, honeywell, invalid }
+enum SupportedDevice { zebra, honeywell, datalogic, invalid }
 
 class ScanwedgeChannel {
   static const channel = 'scanwedge';
@@ -53,7 +53,12 @@ class ScanwedgeChannel {
     return ScanwedgeChannel._(supportedDevice: SupportedDevice.invalid);
   }
 
-  static SupportedDevice _fetchSupportedDevice(String apiVersion) => switch (apiVersion) { 'ZEBRA' => SupportedDevice.zebra, 'HONEYWELL' => SupportedDevice.honeywell, _ => SupportedDevice.invalid };
+  static SupportedDevice _fetchSupportedDevice(String apiVersion) => switch (apiVersion) {
+        'ZEBRA' => SupportedDevice.zebra,
+        'HONEYWELL' => SupportedDevice.honeywell,
+        'DATALOGIC' => SupportedDevice.datalogic,
+        _ => SupportedDevice.invalid,
+      };
 
   Future<void> _methodHandler(MethodCall call) async {
     debugPrint("_methodHandler($call, ${call.arguments})-${call.method}");
@@ -94,7 +99,7 @@ class ScanwedgeChannel {
   Future<bool> disableScanner() async => isDeviceSupported ? await _methodChannel.invokeMethod<bool>('disableScanner') ?? false : false;
   Future<bool> createProfile({required ProfileModel profile}) async {
     try {
-      debugPrint('createProfile($profile)-$isDeviceSupported');
+      debugPrint('createProfile(${profile.toMap})-$isDeviceSupported');
       return isDeviceSupported ? await _methodChannel.invokeMethod<bool>('createProfile', profile.toMap) ?? false : false;
     } catch (e) {
       debugPrint('createProfile, Error: $e');

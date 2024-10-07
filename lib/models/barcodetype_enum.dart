@@ -37,4 +37,11 @@ class BarcodeConfig {
         if (minLength != null) 'minLength': minLength!,
         if (maxLength != null) 'maxLength': maxLength!,
       };
+  factory BarcodeConfig.fromMap(Map<String, dynamic> map) {
+    return BarcodeConfig(
+      barcodeType: BarcodeTypes.values.firstWhere((e) => e.name == map['type']),
+      minLength: map['minLength'],
+      maxLength: map['maxLength'],
+    );
+  }
 }
