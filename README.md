@@ -1,9 +1,9 @@
 # Scanwedge
 
 Scanwedge is a Flutter plugin for Android devices that have hardware barcode scanner functionality.<br>
-Currently it supports Honeywell and Zebra devices.<br>
+Currently it supports Honeywell, Datalogic and Zebra devices.<br>
 This will only work for these Android devices, but it will not have any negative impact on other devices.<br>
-Code inspired by sample code from Honeywell, Zebra and ofcourse the whole Flutter community.
+Code inspired by sample code from Honeywell, Zebra and ofcourse the Flutter community.
 
 ## Getting Started
 
