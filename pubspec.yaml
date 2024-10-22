@@ -4,7 +4,7 @@ version: 1.0.0
 homepage: https://github.com/Rokke/scanwedge
 
 environment:
-  sdk: '>=3.0.0-417.4.beta <4.0.0'
+  sdk: '>=3.0.0 <4.0.0'
   flutter: ">=3.3.0"
 
 dependencies:
