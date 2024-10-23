@@ -20,10 +20,13 @@ class DatalogicPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
     private val EXTRA_CONFIGURATION_CHANGED_MAP="com.datalogic.device.intent.extra.configuration.CHANGED_MAP"
     private val ACTION_START_DECODE = "com.datalogic.decode.action.START_DECODE"
     private val ACTION_STOP_DECODE = "com.datalogic.decode.action.STOP_DECODE"
+    // Docs: https://datalogic.github.io/android-sdk-docs/reference/com/datalogic/device/configuration/PropertyID.html
+    private val WEDGE_INTENT_EXTRA_BARCODE_DATA=0x00030d44
     private val WEDGE_INTENT_EXTRA_BARCODE_STRING=0x00030d46
     private val WEDGE_INTENT_EXTRA_BARCODE_TYPE=0x00030d45
     private val WEDGE_INTENT_ACTION_NAME=0x00030d41
     private val ACTION_BARCODE_STRING="data"
+    private val ACTION_EXTRABARCODE_STRING="extra"
     private val ACTION_BARCODE_TYPE="codeId"
     private val WEDGE_KEYBOARD_ENABLE=0x00011170
     private val WEDGE_INTENT_ENABLE=0x00030d40
@@ -37,14 +40,16 @@ class DatalogicPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
           if (ScanwedgePlugin.SCANWEDGE_ACTION == intent.action) {
               val codeId = intent.getStringExtra(ACTION_BARCODE_TYPE)
               val barcode = intent.getStringExtra(ACTION_BARCODE_STRING)
-              val extra=intent.extras?.getSerializable("extra")
-              if(extra is ByteArray){
-                log?.i(TAG, "extra: ${extra.size}, ${extra.joinToString(","){it.toString()}}")
-              }
+              val extra=intent.extras?.getSerializable(ACTION_EXTRABARCODE_STRING)
               val timestamp = intent.getStringExtra("timestamp")
-                log?.i(TAG, "Barcode Data: $barcode, $codeId, $timestamp")
-              if(barcode==null || codeId==null){
-                log?.e(TAG, "barcode is null")
+              if(codeId==null){
+                log?.e(TAG, "codeId is null, $barcode, $extra, $timestamp")
+              }else if(extra is ByteArray){   // Prefer extra data if available since barcode data might have keyboard wedge prefix/suffix
+                val extraString=String(extra)
+                log?.i(TAG, "extra: ${extra.size}, $extraString, $codeId, $timestamp")
+                scanW.sendScanResult(ScanResult(extraString, BarcodeTypes.fromDatalogicCode(codeId), codeId))
+              }else if(barcode==null){
+                log?.e(TAG, "no barcode or extra data, $codeId, $timestamp")
               }else{
                 log?.i(TAG, "Barcode Data: $barcode, $codeId, $timestamp")
                 scanW.sendScanResult(ScanResult(barcode, BarcodeTypes.fromDatalogicCode(codeId), codeId))
@@ -64,7 +69,7 @@ class DatalogicPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
           filter.addCategory("SCAN")
           context.registerReceiver(barcodeDataReceiver, filter)
           scanW.sendBroadcast(Intent(ACTION_CONFIGURATION_COMMIT).apply{
-            putExtra(EXTRA_CONFIGURATION_CHANGED_MAP, "WEDGE_KEYBOARD_ENABLE=false,WEDGE_INTENT_ACTION_NAME=${ScanwedgePlugin.SCANWEDGE_ACTION},WEDGE_INTENT_CATEGORY_NAME=SCAN,WEDGE_INTENT_EXTRA_BARCODE_STRING=$ACTION_BARCODE_STRING,WEDGE_INTENT_EXTRA_BARCODE_TYPE=$ACTION_BARCODE_TYPE,WEDGE_INTENT_ENABLE=true")
+            putExtra(EXTRA_CONFIGURATION_CHANGED_MAP, "WEDGE_KEYBOARD_ENABLE=false,WEDGE_INTENT_ACTION_NAME=${ScanwedgePlugin.SCANWEDGE_ACTION},WEDGE_INTENT_CATEGORY_NAME=SCAN,WEDGE_INTENT_EXTRA_BARCODE_STRING=$ACTION_BARCODE_STRING,WEDGE_INTENT_EXTRA_BARCODE_DATA=$ACTION_EXTRABARCODE_STRING,WEDGE_INTENT_EXTRA_BARCODE_TYPE=$ACTION_BARCODE_TYPE,WEDGE_INTENT_ENABLE=true")
           })
           return true
         } catch (e: Exception) {
