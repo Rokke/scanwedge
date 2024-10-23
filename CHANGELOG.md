@@ -27,3 +27,6 @@
 * Added Datalogic support
 
 ## 1.0.0
+
+## 1.0.1
+* Datalogic devices send raw scanned data and not converted data based on prefix/suffix on wedge

@@ -46,6 +46,7 @@ class _MyAppState extends State<MyApp> {
             BarcodeConfig(barcodeType: BarcodeTypes.ean13),
             BarcodeConfig(barcodeType: BarcodeTypes.i2of5),
           ], enableKeyStroke: !notifierDisableKeystroke.value, aimType: notifierAimType.value) : ProfileModel(profileName: 'DemoProfile', enabledBarcodes: [
+            BarcodeTypes.code39.create(),
             BarcodeTypes.code128.create(minLength: 10, maxLength: 15),
             BarcodeTypes.qrCode.create(),
           ], keepDefaults: false))}');
