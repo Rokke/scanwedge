@@ -92,7 +92,7 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
             if(barcodePlugin!=null) barcodeList.add(barcodePlugin)
           }
         }
-        hardwarePlugin?.createProfile(config["name"] as String, barcodeList, config!!["hwConfig"] as? HashMap<String, Any>, config["keepDefaults"] as Boolean? ?: true)
+        hardwarePlugin?.createProfile(config["name"] as String, barcodeList, config["hwConfig"] as? HashMap<String, Any>, config["keepDefaults"] as Boolean? ?: true)
         result.success(true)
       }else{
         log?.e(TAG, "createProfile: Invalid config")
