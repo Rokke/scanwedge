@@ -6,17 +6,10 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 
-import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-
-import no.talgoe.scanwedge.scanwedge.Logger
-
 // Hardware plugin for Zebra devices that extends the IHardwarePlugin interface.
 class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) : IHardwarePlugin{
     private val DATAWEDGE_SEND_ACTION = "com.symbol.datawedge.api.ACTION"
     private val NOTIFICATION_ACTION = "com.symbol.datawedge.api.NOTIFICATION_ACTION"
-    private val RESULT_SCANNER_IDENTIFIER="com.symbol.datawedge.scanner_identifier"
     private val RESULT_LABEL_TYPE="com.symbol.datawedge.label_type"
     private val RESULT_BARCODE="com.symbol.datawedge.data_string"
     private val RESULT_ACTION = "com.symbol.datawedge.api.RESULT_ACTION"
@@ -151,7 +144,7 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
       val bKeyStroke = Bundle()
       bKeyStroke.putString("PLUGIN_NAME", "KEYSTROKE")
       val bKeyStrokeParams = Bundle()
-      bKeyStrokeParams.putString("keystroke_output_enabled", "${enableKeyStroke}")
+      bKeyStrokeParams.putString("keystroke_output_enabled", "$enableKeyStroke")
       bKeyStroke.putBundle("PARAM_LIST", bKeyStrokeParams)
       arrayBundleConfig.add(bKeyStroke)
       arrayBundleConfig.add(Bundle().apply {
@@ -194,33 +187,6 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
         else->null
       }
     }
-    fun iterateIntent(parameter: Map<String,Any>):Bundle{
-      val bundle=Bundle()
-      for((key,value) in parameter){
-        if(value is String){
-          bundle.putString(key, value)
-        }else{
-          if(value is List<*>){
-            val bundleArray=ArrayList(value.filter{ it is HashMap<*,*>}.map{
-              @Suppress("UNCHECKED_CAST")
-              iterateIntent(it as HashMap<String,Any>)
-            })
-            if(bundleArray.isNotEmpty()){
-              if(key=="APP_LIST") bundle.putParcelableArray(key, bundleArray.toTypedArray())
-              else bundle.putParcelableArrayList(key, bundleArray)
-            }
-            val stringArray=value.filter{ it is String}.map{ it as String }
-            if(stringArray.isNotEmpty()){
-              bundle.putStringArray(key, stringArray.toTypedArray())
-            }
-          }else{
-            @Suppress("UNCHECKED_CAST")
-            bundle.putBundle(key, (value as? HashMap<String, Any>)?.let { iterateIntent(it) })
-          }
-        }
-      }
-      return bundle
-    }
     fun sendCommandBundle(command: String, parameter: HashMap<String,Any>?, shouldRetry:Boolean):Boolean{
       log?.i(TAG, "sendCommandBundle($command, $parameter, $shouldRetry)")
       if(parameter!=null){
@@ -232,20 +198,7 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
         return false
       }
     }
-    fun sendCommandBundleIntent(command: String, parameter: HashMap<String,Any>, shouldRetry:Boolean):Intent{
-      log?.i(TAG, "sendCommandBundleIntent($command, $parameter, $shouldRetry)")
-      val dwIntent = Intent()
-      dwIntent.action = DATAWEDGE_SEND_ACTION
-      val bundle=iterateIntent(parameter)
-      log?.d(TAG, "sendCommandBundleIntent: $command, ${bundle.keySet().joinToString(", ", "{", "}"){it->"$it=${bundle[it]}"}}")
-      dwIntent.putExtra(command, bundle)
-      if(shouldRetry==true){
-        log?.i(TAG, "onMethodCall: SEND_RESULT")
-        dwIntent.putExtra("SEND_RESULT", "COMPLETE_RESULT")
-        dwIntent.putExtra("COMMAND_IDENTIFIER", "INTENT_API")
-      }
-      return dwIntent
-    }
+
     fun sendCommand(command: String, parameter: String):Boolean{
       log?.i(TAG, "sendCommand($command, $parameter)")
       val dwIntent = Intent()
@@ -253,5 +206,46 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
       dwIntent.putExtra(command, parameter)
       scanW.sendBroadcast(dwIntent)
       return true
+    }
+    private fun iterateIntent(parameter: Map<String,Any>):Bundle{
+      val bundle=Bundle()
+      for((key,value) in parameter){
+        if(value is String){
+          bundle.putString(key, value)
+        }else{
+          if(value is List<*>){
+            val bundleArray=ArrayList(value.filterIsInstance<HashMap<*, *>>().map{
+              @Suppress("UNCHECKED_CAST")
+              iterateIntent(it as HashMap<String,Any>)
+            })
+            if(bundleArray.isNotEmpty()){
+              if(key=="APP_LIST") bundle.putParcelableArray(key, bundleArray.toTypedArray())
+              else bundle.putParcelableArrayList(key, bundleArray)
+            }
+            val stringArray=value.filterIsInstance<String>().map{ it as String }
+            if(stringArray.isNotEmpty()){
+              bundle.putStringArray(key, stringArray.toTypedArray())
+            }
+          }else{
+            @Suppress("UNCHECKED_CAST")
+            bundle.putBundle(key, (value as? HashMap<String, Any>)?.let { iterateIntent(it) })
+          }
+        }
+      }
+      return bundle
+    }
+    private fun sendCommandBundleIntent(command: String, parameter: HashMap<String,Any>, shouldRetry:Boolean):Intent{
+      log?.i(TAG, "sendCommandBundleIntent($command, $parameter, $shouldRetry)")
+      val dwIntent = Intent()
+      dwIntent.action = DATAWEDGE_SEND_ACTION
+      val bundle=iterateIntent(parameter)
+      log?.d(TAG, "sendCommandBundleIntent: $command, ${bundle.keySet().joinToString(", ", "{", "}"){it->"$it=${bundle[it]}"}}")
+      dwIntent.putExtra(command, bundle)
+      if(shouldRetry){
+        log?.i(TAG, "onMethodCall: SEND_RESULT")
+        dwIntent.putExtra("SEND_RESULT", "COMPLETE_RESULT")
+        dwIntent.putExtra("COMMAND_IDENTIFIER", "INTENT_API")
+      }
+      return dwIntent
     }
   }

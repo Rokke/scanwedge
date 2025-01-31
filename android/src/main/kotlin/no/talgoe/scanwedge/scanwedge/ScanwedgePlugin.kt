@@ -1,23 +1,16 @@
 package no.talgoe.scanwedge.scanwedge
 
-import androidx.annotation.NonNull
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import android.os.Bundle
-import android.os.Parcelable
 import android.provider.Settings
+import androidx.annotation.NonNull
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-
-import no.talgoe.scanwedge.scanwedge.IHardwarePlugin
-import no.talgoe.scanwedge.scanwedge.ZebraPlugin
-import no.talgoe.scanwedge.scanwedge.Logger
 
 interface IScanHandler {
   fun sendScanResult(scanResult: ScanResult)
@@ -29,24 +22,27 @@ interface IScanHandler {
 /** ScanwedgePlugin */
 class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallHandler, IScanHandler {
   companion object {
-    val SCANWEDGE_ACTION="no.mobcon.scanwedge.SCAN"
+    const val SCANWEDGE_ACTION="no.mobcon.scanwedge.SCAN"
   }
   private val TAG="DataWedgePlugin"
   private lateinit var channel : MethodChannel
   private var context: Context?=null
-  private lateinit var dataWedgeBroadcastReceiver: BroadcastReceiver
   private var hardwarePlugin: IHardwarePlugin?=null
+
   override fun sendScanResult(scanResult: ScanResult){
     log?.i(TAG, "sendScanResult: $scanResult")
     channel.invokeMethod("scan", scanResult.toMap())
   }
-  override fun sendResult(json: Any?){
-    log?.i(TAG, "sendResult: $json")
-    channel.invokeMethod("result", json)
+
+  override fun sendResult(data: Any?){
+    log?.i(TAG, "sendResult: $data")
+    channel.invokeMethod("result", data)
   }
+
   override fun getPackageName(): String{
-    return context?.getPackageName()?:""
+    return context?.packageName ?:""
   }
+
   override fun sendBroadcast(intent: Intent){
     log?.i(TAG, "sendBroadcast: ${intent.toUri(0)}")
     val resultReceiver = object : BroadcastReceiver() {
@@ -59,6 +55,7 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
     }
     context?.sendOrderedBroadcast(intent, null, resultReceiver, null, 0, null, null)
   }
+
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     log=AndroidLogger()
     log?.d(TAG, "onAttachedToEngine-Start")
@@ -66,10 +63,11 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
     channel.setMethodCallHandler(this)
     context=flutterPluginBinding.applicationContext
   }
+
   override fun onMethodCall(call: MethodCall, result: Result) {
     log?.d(TAG, "onMethodCall: ${call.method}, ${call.arguments}")
     if (call.method == "getDeviceInfo") {
-      result.success("${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}|${context?.getPackageName()}|${Settings.Global.getString(context?.contentResolver, Settings.Global.DEVICE_NAME)}")
+      result.success("${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}|${context?.packageName}|${Settings.Global.getString(context?.contentResolver, Settings.Global.DEVICE_NAME)}")
     }else if(call.method == "toggleScanning"){
       hardwarePlugin?.toggleScanning()
       result.success(true)
@@ -79,7 +77,6 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
       result.success(hardwarePlugin?.disableScanner())
     }else if(call.method == "createProfile"){
       val argument=call.arguments
-      @Suppress("UNCHECKED_CAST")
       val config = argument as HashMap<String, Any>?
       if(config!=null){
         val barcodeList=ArrayList<BarcodePlugin>()
@@ -141,13 +138,6 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
       log?.w(TAG, "onMethodCall: notImplemented(${call.method})")
       result.notImplemented()
     }
-  }
-  fun createIntent(packageName:String):Array<Bundle>{
-    log?.i(TAG, "createIntent($packageName)")
-    val bundle=Bundle()
-    bundle.putStringArray("ACTIVITY_LIST", arrayOf("*"))
-    bundle.putString("PACKAGE_NAME", packageName)
-    return arrayOf(bundle)
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
