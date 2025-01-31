@@ -18,6 +18,7 @@ enum class BarcodeTypes(val code: String) {
     I2OF5("i2of5"),
     MAILMARK("mailmark"),
     MAXICODE("maxicode"),
+    MICROQR("microqr"),
     PDF417("pdf417"),
     QRCODE("qrCode"),
     UPCA("upca"),
@@ -40,7 +41,7 @@ enum class BarcodeTypes(val code: String) {
                 "LABEL-TYPE-CODE128" -> BarcodeTypes.CODE128
                 "LABEL-TYPE-CODE39" -> BarcodeTypes.CODE39
                 "LABEL-TYPE-CODE93" -> BarcodeTypes.CODE93
-                "LABEL-TYPE-DATAMATRIX" -> BarcodeTypes.DATAMATRIX
+                "LABEL-TYPE-DATAMATRIX" -> DATAMATRIX
                 "LABEL-TYPE-EAN8" -> BarcodeTypes.EAN8
                 "LABEL-TYPE-EAN128" -> BarcodeTypes.EAN128
                 "LABEL-TYPE-EAN13" -> BarcodeTypes.EAN13
@@ -50,9 +51,9 @@ enum class BarcodeTypes(val code: String) {
                 "LABEL-TYPE-MAILMARK" -> BarcodeTypes.MAILMARK
                 "LABEL-TYPE-MAXICODE" -> BarcodeTypes.MAXICODE
                 "LABEL-TYPE-PDF417" -> BarcodeTypes.PDF417
-                "LABEL-TYPE-QRCODE" -> BarcodeTypes.QRCODE
+                "LABEL-TYPE-QRCODE" -> QRCODE
                 "LABEL-TYPE-UPCA" -> BarcodeTypes.UPCA
-                "LABEL-TYPE-UPCE0" -> BarcodeTypes.UPCE0
+                "LABEL-TYPE-UPCE0" -> UPCE0
                 else -> BarcodeTypes.UNKNOWN
             }
         }
@@ -63,7 +64,7 @@ enum class BarcodeTypes(val code: String) {
                     "Code 128" -> BarcodeTypes.CODE128
                     "Code 39" -> BarcodeTypes.CODE39
                     "Code 93" -> BarcodeTypes.CODE93
-                    "Data Matrix" -> BarcodeTypes.DATAMATRIX
+                    "Data Matrix" -> DATAMATRIX
                     "EAN-8" -> BarcodeTypes.EAN8
                     "GS1-128" -> BarcodeTypes.EAN128
                     "EAN-13" -> BarcodeTypes.EAN13
@@ -72,9 +73,9 @@ enum class BarcodeTypes(val code: String) {
                     "GS1 DataBar Expanded" -> BarcodeTypes.GS1_DATABAR_EXPANDED
                     "Interleaved 2 of 5" -> BarcodeTypes.I2OF5
                     "PDF417" -> BarcodeTypes.PDF417
-                    "QR Code" -> BarcodeTypes.QRCODE
+                    "QR Code" -> QRCODE
                     "UPC-A" -> BarcodeTypes.UPCA
-                    "UPC-E" -> BarcodeTypes.UPCE0
+                    "UPC-E" -> UPCE0
                 else -> BarcodeTypes.UNKNOWN
             }
         }
@@ -127,7 +128,7 @@ enum class BarcodeTypes(val code: String) {
                 "j" -> BarcodeTypes.CODE128
                 "b" -> BarcodeTypes.CODE39
                 "i" -> BarcodeTypes.CODE93
-                "w" -> BarcodeTypes.DATAMATRIX
+                "w" -> DATAMATRIX
                 "D" -> BarcodeTypes.EAN8
                 "`" -> BarcodeTypes.EAN13          // "EAN13_ISBN"
                 "d" -> BarcodeTypes.EAN13
@@ -137,9 +138,9 @@ enum class BarcodeTypes(val code: String) {
                 "e" -> BarcodeTypes.I2OF5
                 "x" -> BarcodeTypes.MAXICODE
                 "r" -> BarcodeTypes.PDF417
-                "s" -> BarcodeTypes.QRCODE
+                "s" -> QRCODE
                 "c" -> BarcodeTypes.UPCA
-                "E" -> BarcodeTypes.UPCE0
+                "E" -> UPCE0
                 else -> BarcodeTypes.UNKNOWN
 /*               "." -> "DOTCODE"
               "1" -> "CODE1"
@@ -189,7 +190,28 @@ enum class BarcodeTypes(val code: String) {
               "{" -> "GS1_DATABAR_LIM"*/
             }
           }
+
+        fun fromNewlandCode(codeId: String?):BarcodeTypes{
+            return when(codeId){
+                // Linear
+                "CODE128" -> CODE128
+                "CODE39" -> CODE39
+                "UCCEAN128" -> EAN128
+                // EAN / UPC
+                "EAN8" -> EAN8
+                "EAN13" -> EAN13
+                "UPCA" -> UPCA
+                "UPCE" -> UPCE0
+                // 2D
+                "QRCode" -> QRCODE
+                "DATAMATRIX" -> DATAMATRIX
+                "PDF417" -> PDF417
+                "MICROQR" -> MICROQR
+                else -> UNKNOWN
+            }
+        }
     }
+
     // A function that returns the zebra implementation name of the barcode type
     // See https://techdocs.zebra.com/datawedge/latest/guide/decoders/ for more information
     fun zebraDecoderName(): String? {

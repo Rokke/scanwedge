@@ -98,16 +98,23 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
     }else if(call.method=="initializeDataWedge"){
       // Checking if the device is a Zebra device. Checking that Build.MANUFACTURER or Build.MODEL starts with 'ZEBRA' using uppercase letters.
       log?.i(TAG, "isSupported-manufacturer: ${android.os.Build.MANUFACTURER}, model: ${android.os.Build.MODEL}")
-      if(android.os.Build.MANUFACTURER!=null){
-        val manufacturer=android.os.Build.MANUFACTURER.uppercase().split(" ")[0]
-        // update hardwarePlugin based on manufacturer string
-        hardwarePlugin=if(manufacturer=="ZEBRA") ZebraPlugin(this, log) else if(manufacturer=="HONEYWELL") HoneywellPlugin(this, log) else if(manufacturer=="DATALOGIC") DatalogicPlugin(this, log) else null
-        hardwarePlugin?.initialize(context)
-        log?.i(TAG, "initializeDataWedge: ${hardwarePlugin?.javaClass?.name}")
-        result.success("${hardwarePlugin?.apiVersion}|${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}|${context?.getPackageName()}|${Settings.Global.getString(context?.contentResolver, Settings.Global.DEVICE_NAME)}")
-      }else{
+      val manufacturer = android.os.Build.MANUFACTURER?.uppercase()?.split(" ")?.get(0)
+      if (manufacturer == null) {
         result.error("MANUFACTURER_NOT_FOUND", "Manufacturer not found", "Manufacturer not found")
+        return
       }
+
+      // update hardwarePlugin based on manufacturer string
+      hardwarePlugin = when (manufacturer) {
+        "ZEBRA" -> ZebraPlugin(this, log)
+        "HONEYWELL" -> HoneywellPlugin(this, log)
+        "DATALOGIC" -> DatalogicPlugin(this, log)
+        "NEWLAND" -> NewlandPlugin(this, log)
+        else -> null
+      }
+      hardwarePlugin?.initialize(context)
+      log?.i(TAG, "initializeDataWedge: ${hardwarePlugin?.javaClass?.name}")
+      result.success("${hardwarePlugin?.apiVersion}|${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}|${context?.getPackageName()}|${Settings.Global.getString(context?.contentResolver, Settings.Global.DEVICE_NAME)}")
     }else if(call.method=="sendCommand"){
       if(hardwarePlugin is ZebraPlugin){
         val command=call.argument<String>("command")
