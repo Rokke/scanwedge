@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:scanwedge/models/batterystate.dart';
 import 'package:scanwedge/scanwedge.dart';
 
-enum SupportedDevice { zebra, honeywell, datalogic, invalid }
+enum SupportedDevice { zebra, honeywell, datalogic, newland, invalid }
 
 class ScanwedgeChannel {
   static const channel = 'scanwedge';
@@ -58,6 +58,7 @@ class ScanwedgeChannel {
         'ZEBRA' => SupportedDevice.zebra,
         'HONEYWELL' => SupportedDevice.honeywell,
         'DATALOGIC' => SupportedDevice.datalogic,
+        'NEWLAND' => SupportedDevice.newland,
         _ => SupportedDevice.invalid,
       };
 

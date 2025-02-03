@@ -1,9 +1,10 @@
 # Scanwedge
 
 Scanwedge is a Flutter plugin for Android devices that have hardware barcode scanner functionality.<br>
-Currently it supports Honeywell, Datalogic and Zebra devices.<br>
+Currently it supports Honeywell, Datalogic, Newland and Zebra devices.<br>
 This will only work for these Android devices, but it will not have any negative impact on other devices.<br>
 Code inspired by sample code from Honeywell, Zebra and ofcourse the Flutter community.
+Thanks to @M-Ahal for adding Newland support.
 
 ## Getting Started
 
@@ -14,7 +15,7 @@ Code inspired by sample code from Honeywell, Zebra and ofcourse the Flutter comm
 |**disableScanner**|Disables the scanner, for Honeywell devices it will still "read" but not send the result|
 |**enableScanner**|Enables the scanner|
 |**initialize**|Requests and initialize the Scanwedge, this must be called before using the Scanwedge|
-|**isDeviceSupported**|Returns true if it's a supported device(Honeywell or Zebra), if this is false the other methods will be ignored when called|
+|**isDeviceSupported**|Returns true if it's a supported device, if this is false the other methods will be ignored when called|
 |**manufacturer**|Returns the manufacturer of the device|
 |**modelName**|Returns the modelname of the device|
 |**osVersion**|Returns the OS version on the device|
@@ -23,6 +24,7 @@ Code inspired by sample code from Honeywell, Zebra and ofcourse the Flutter comm
 |**supportedDevice**|Returns a [SupportedDevice] object with the information if the device is supported and the type|
 |**stream**|Request a stream of barcode scans, returns barcodes scanned with the [ScanResult]|
 |**toggleScanning**|Triggers a scan (SOFTTRIGGER)|
+|**getBatteryStatus**|Returns the battery status of the device. This function might be removed from this package in the future|
 
 &nbsp;
 

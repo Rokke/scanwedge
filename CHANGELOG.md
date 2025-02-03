@@ -34,3 +34,6 @@
 ## 1.0.2
 * Android 14 support (added receiver)
 * Added simple function for fetching batterystate. NB! This might be moved to a separate plugin in the future
+
+## 1.0.3
+* Added newland support thanks to @M-Ahal

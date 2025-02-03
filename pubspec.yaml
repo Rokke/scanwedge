@@ -1,6 +1,6 @@
 name: scanwedge
 description: A Flutter plugin to communicate with the Zebra Datawedge
-version: 1.0.2
+version: 1.0.3
 homepage: https://github.com/Rokke/scanwedge
 
 environment:
