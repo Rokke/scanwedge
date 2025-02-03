@@ -100,7 +100,8 @@ class DatalogicPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
         val datalogicDefaultTypes=BarcodeTypes.datalogicDefaultTypes().toMutableList()
         val properties = ArrayList<String>()
         if(enabledBarcodes!=null){
-            for(barcode in enabledBarcodes){ barcode.datalogicAddToList(properties)
+            for(barcode in enabledBarcodes){
+                barcode.datalogicAddToList(properties)
                 datalogicDefaultTypes.remove(barcode.type)
             }
         }
