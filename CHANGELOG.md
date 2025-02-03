@@ -30,3 +30,7 @@
 
 ## 1.0.1
 * Datalogic devices send raw scanned data and not converted data based on prefix/suffix on wedge
+
+## 1.0.2
+* Android 14 support (added receiver)
+* Added simple function for fetching batterystate. NB! This might be moved to a separate plugin in the future

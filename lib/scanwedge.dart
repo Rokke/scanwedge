@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:scanwedge/models/batterystate.dart';
 import 'package:scanwedge/models/profile_model.dart';
 import 'package:scanwedge/models/scanprofile.dart';
 import 'package:scanwedge/models/scanresult.dart';
@@ -93,6 +94,8 @@ class Scanwedge {
 
   @Deprecated('This is for backwards compatibility and has no use')
   Future<String?> getDeviceInfo() => Future.value('DEPRECATED');
+
+  Future<BatteryState> getBatteryStatus() => _scanwedgeChannel.getBatteryStatus();
 
   /// Send basic simple commands to the DataWedge
   /// [command] is the command to be used

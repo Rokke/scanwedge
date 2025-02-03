@@ -70,6 +70,8 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
     log?.d(TAG, "onMethodCall: ${call.method}, ${call.arguments}")
     if (call.method == "getDeviceInfo") {
       result.success("${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}|${context?.getPackageName()}|${Settings.Global.getString(context?.contentResolver, Settings.Global.DEVICE_NAME)}")
+    }else if(call.method == "getBatteryStatus"){
+      result.success(Utilities.getBatteryStatus(context!!))
     }else if(call.method == "toggleScanning"){
       hardwarePlugin?.toggleScanning()
       result.success(true)

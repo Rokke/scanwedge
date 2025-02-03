@@ -27,10 +27,8 @@ class _MyAppState extends State<MyApp> {
     try {
       Scanwedge.initialize().then((scanwedge) {
         _scanwedgePlugin = scanwedge;
+        _deviceInfo = scanwedge.deviceName;
         setState(() {});
-        scanwedge.getDeviceInfo().then((devInfo) => setState(() {
-              _deviceInfo = devInfo;
-            }));
       });
     } catch (e) {
       log('initState Exception: $e');
@@ -88,11 +86,16 @@ class _MyAppState extends State<MyApp> {
                   value: 'exit',
                   child: Text('Exit application'),
                 ),
+                const PopupMenuItem(
+                  value: 'battery',
+                  child: Text('Get battery status'),
+                ),
               ],
               onSelected: (value) => switch (value) {
                 'trigger' => _triggerScan(),
                 'enable' => _scanwedgePlugin?.enableScanner(),
                 'disable' => _scanwedgePlugin?.disableScanner(),
+                'battery' => _scanwedgePlugin?.getBatteryStatus().then((status) => log('Battery status: $status')),
                 'exit' => exit(0),
                 _ => null,
               },

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:scanwedge/models/batterystate.dart';
 import 'package:scanwedge/scanwedge.dart';
 
 enum SupportedDevice { zebra, honeywell, datalogic, invalid }
@@ -106,6 +107,8 @@ class ScanwedgeChannel {
       return false;
     }
   }
+
+  Future<BatteryState> getBatteryStatus() async => BatteryState.fromReceiver(await _methodChannel.invokeMethod<String>('getBatteryStatus') ?? '');
 
   @Deprecated('This is for backwards compatibility and only support Zebra devices, this will be removed later')
   Future<bool> sendCommand({required String command, required String parameter}) async =>
