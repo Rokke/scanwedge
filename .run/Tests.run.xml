@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Tests" type="FlutterTestConfigType" factoryName="Flutter Test">
-    <option name="testFile" value="$PROJECT_DIR$/test/scanwedge_test.dart" />
-    <option name="useRegexp" value="false" />
-    <option name="additionalArgs" value="" />
-    <method v="2" />
-  </configuration>
-</component>
