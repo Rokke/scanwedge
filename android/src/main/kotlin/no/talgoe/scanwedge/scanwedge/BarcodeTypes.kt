@@ -18,6 +18,7 @@ enum class BarcodeTypes(val code: String) {
     I2OF5("i2of5"),
     MAILMARK("mailmark"),
     MAXICODE("maxicode"),
+    MICROQR("microqr"),
     PDF417("pdf417"),
     QRCODE("qrCode"),
     UPCA("upca"),
@@ -35,47 +36,47 @@ enum class BarcodeTypes(val code: String) {
         }
         fun fromZebraCode(codeId: String?):BarcodeTypes{
             return when(codeId){
-                "LABEL-TYPE-AZTEC" -> BarcodeTypes.AZTEC
-                "LABEL-TYPE-CODABAR" -> BarcodeTypes.CODABAR
-                "LABEL-TYPE-CODE128" -> BarcodeTypes.CODE128
-                "LABEL-TYPE-CODE39" -> BarcodeTypes.CODE39
-                "LABEL-TYPE-CODE93" -> BarcodeTypes.CODE93
-                "LABEL-TYPE-DATAMATRIX" -> BarcodeTypes.DATAMATRIX
-                "LABEL-TYPE-EAN8" -> BarcodeTypes.EAN8
-                "LABEL-TYPE-EAN128" -> BarcodeTypes.EAN128
-                "LABEL-TYPE-EAN13" -> BarcodeTypes.EAN13
-                "LABEL-TYPE-GS1_DATABAR" -> BarcodeTypes.GS1_DATABAR
-                "LABEL-TYPE-GS1_DATABAR_EXP" -> BarcodeTypes.GS1_DATABAR_EXPANDED
-                "LABEL-TYPE-I2OF5" -> BarcodeTypes.I2OF5
-                "LABEL-TYPE-MAILMARK" -> BarcodeTypes.MAILMARK
-                "LABEL-TYPE-MAXICODE" -> BarcodeTypes.MAXICODE
-                "LABEL-TYPE-PDF417" -> BarcodeTypes.PDF417
-                "LABEL-TYPE-QRCODE" -> BarcodeTypes.QRCODE
-                "LABEL-TYPE-UPCA" -> BarcodeTypes.UPCA
-                "LABEL-TYPE-UPCE0" -> BarcodeTypes.UPCE0
-                else -> BarcodeTypes.UNKNOWN
+                "LABEL-TYPE-AZTEC" -> AZTEC
+                "LABEL-TYPE-CODABAR" -> CODABAR
+                "LABEL-TYPE-CODE128" -> CODE128
+                "LABEL-TYPE-CODE39" -> CODE39
+                "LABEL-TYPE-CODE93" -> CODE93
+                "LABEL-TYPE-DATAMATRIX" -> DATAMATRIX
+                "LABEL-TYPE-EAN8" -> EAN8
+                "LABEL-TYPE-EAN128" -> EAN128
+                "LABEL-TYPE-EAN13" -> EAN13
+                "LABEL-TYPE-GS1_DATABAR" -> GS1_DATABAR
+                "LABEL-TYPE-GS1_DATABAR_EXP" -> GS1_DATABAR_EXPANDED
+                "LABEL-TYPE-I2OF5" -> I2OF5
+                "LABEL-TYPE-MAILMARK" -> MAILMARK
+                "LABEL-TYPE-MAXICODE" -> MAXICODE
+                "LABEL-TYPE-PDF417" -> PDF417
+                "LABEL-TYPE-QRCODE" -> QRCODE
+                "LABEL-TYPE-UPCA" -> UPCA
+                "LABEL-TYPE-UPCE0" -> UPCE0
+                else -> UNKNOWN
             }
         }
         fun fromDatalogicCode(codeId: String?):BarcodeTypes{
             return when(codeId){
-                    "Aztec" -> BarcodeTypes.AZTEC
-                "Codabar" -> BarcodeTypes.CODABAR
-                    "Code 128" -> BarcodeTypes.CODE128
-                    "Code 39" -> BarcodeTypes.CODE39
-                    "Code 93" -> BarcodeTypes.CODE93
-                    "Data Matrix" -> BarcodeTypes.DATAMATRIX
-                    "EAN-8" -> BarcodeTypes.EAN8
-                    "GS1-128" -> BarcodeTypes.EAN128
-                    "EAN-13" -> BarcodeTypes.EAN13
-                    "GS1 DataBar-14" -> BarcodeTypes.GS1_DATABAR
-                    "GS1 DataBar Limited" -> BarcodeTypes.GS1_DATABAR
-                    "GS1 DataBar Expanded" -> BarcodeTypes.GS1_DATABAR_EXPANDED
-                    "Interleaved 2 of 5" -> BarcodeTypes.I2OF5
-                    "PDF417" -> BarcodeTypes.PDF417
-                    "QR Code" -> BarcodeTypes.QRCODE
-                    "UPC-A" -> BarcodeTypes.UPCA
-                    "UPC-E" -> BarcodeTypes.UPCE0
-                else -> BarcodeTypes.UNKNOWN
+                    "Aztec" -> AZTEC
+                "Codabar" -> CODABAR
+                    "Code 128" -> CODE128
+                    "Code 39" -> CODE39
+                    "Code 93" -> CODE93
+                    "Data Matrix" -> DATAMATRIX
+                    "EAN-8" -> EAN8
+                    "GS1-128" -> EAN128
+                    "EAN-13" -> EAN13
+                    "GS1 DataBar-14" -> GS1_DATABAR
+                    "GS1 DataBar Limited" -> GS1_DATABAR
+                    "GS1 DataBar Expanded" -> GS1_DATABAR_EXPANDED
+                    "Interleaved 2 of 5" -> I2OF5
+                    "PDF417" -> PDF417
+                    "QR Code" -> QRCODE
+                    "UPC-A" -> UPCA
+                    "UPC-E" -> UPCE0
+                else -> UNKNOWN
             }
         }
 /*
@@ -122,25 +123,25 @@ enum class BarcodeTypes(val code: String) {
 */
         fun fromHoneywellCode(codeId: String?):BarcodeTypes{
             return when(codeId){
-                "z" -> BarcodeTypes.AZTEC
-                "a" -> BarcodeTypes.CODABAR
-                "j" -> BarcodeTypes.CODE128
-                "b" -> BarcodeTypes.CODE39
-                "i" -> BarcodeTypes.CODE93
-                "w" -> BarcodeTypes.DATAMATRIX
-                "D" -> BarcodeTypes.EAN8
-                "`" -> BarcodeTypes.EAN13          // "EAN13_ISBN"
-                "d" -> BarcodeTypes.EAN13
-                "I" -> BarcodeTypes.EAN128
-                "y" -> BarcodeTypes.GS1_DATABAR
-                "}" -> BarcodeTypes.GS1_DATABAR_EXPANDED
-                "e" -> BarcodeTypes.I2OF5
-                "x" -> BarcodeTypes.MAXICODE
-                "r" -> BarcodeTypes.PDF417
-                "s" -> BarcodeTypes.QRCODE
-                "c" -> BarcodeTypes.UPCA
-                "E" -> BarcodeTypes.UPCE0
-                else -> BarcodeTypes.UNKNOWN
+                "z" -> AZTEC
+                "a" -> CODABAR
+                "j" -> CODE128
+                "b" -> CODE39
+                "i" -> CODE93
+                "w" -> DATAMATRIX
+                "D" -> EAN8
+                "`" -> EAN13          // "EAN13_ISBN"
+                "d" -> EAN13
+                "I" -> EAN128
+                "y" -> GS1_DATABAR
+                "}" -> GS1_DATABAR_EXPANDED
+                "e" -> I2OF5
+                "x" -> MAXICODE
+                "r" -> PDF417
+                "s" -> QRCODE
+                "c" -> UPCA
+                "E" -> UPCE0
+                else -> UNKNOWN
 /*               "." -> "DOTCODE"
               "1" -> "CODE1"
               ";" -> "MERGED_COUPON"
@@ -189,7 +190,28 @@ enum class BarcodeTypes(val code: String) {
               "{" -> "GS1_DATABAR_LIM"*/
             }
           }
+
+        fun fromNewlandCode(codeId: String?):BarcodeTypes{
+            return when(codeId){
+                // Linear
+                "CODE128" -> CODE128
+                "CODE39" -> CODE39
+                "UCCEAN128" -> EAN128
+                // EAN / UPC
+                "EAN8" -> EAN8
+                "EAN13" -> EAN13
+                "UPCA" -> UPCA
+                "UPCE" -> UPCE0
+                // 2D
+                "QRCode" -> QRCODE
+                "DATAMATRIX" -> DATAMATRIX
+                "PDF417" -> PDF417
+                "MICROQR" -> MICROQR
+                else -> UNKNOWN
+            }
+        }
     }
+
     // A function that returns the zebra implementation name of the barcode type
     // See https://techdocs.zebra.com/datawedge/latest/guide/decoders/ for more information
     fun zebraDecoderName(): String? {

@@ -1,7 +1,6 @@
 package no.talgoe.scanwedge.scanwedge
 
 import android.content.Context
-import android.content.Intent
 
 interface IHardwarePlugin {
     /// This will return the API name together with a possible version number if needed later
