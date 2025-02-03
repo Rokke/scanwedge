@@ -81,7 +81,7 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
       if(config!=null){
         val barcodeList=ArrayList<BarcodePlugin>()
         if(config["barcodes"] is List<*>){
-          val barcodes=config["barcodes"] as List<HashMap<String, Any>>
+          val barcodes=config["barcodes"] as List<*>
           log?.i(TAG, "createProfile: barcodes: $barcodes")
           // convert the list of barcodes to a list of BarcodePlugin
           for(barcode in barcodes){
@@ -114,7 +114,7 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
       }
       hardwarePlugin?.initialize(context)
       log?.i(TAG, "initializeDataWedge: ${hardwarePlugin?.javaClass?.name}")
-      result.success("${hardwarePlugin?.apiVersion}|${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}|${context?.getPackageName()}|${Settings.Global.getString(context?.contentResolver, Settings.Global.DEVICE_NAME)}")
+      result.success("${hardwarePlugin?.apiVersion}|${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}|${context?.packageName}|${Settings.Global.getString(context?.contentResolver, Settings.Global.DEVICE_NAME)}")
     }else if(call.method=="sendCommand"){
       if(hardwarePlugin is ZebraPlugin){
         val command=call.argument<String>("command")

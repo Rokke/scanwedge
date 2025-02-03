@@ -1,14 +1,10 @@
 package no.talgoe.scanwedge.scanwedge
 
-import android.util.Log
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import kotlin.test.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
 import org.mockito.Mockito
 // import no.talgoe.scanwedge.scanwedge.ScanwedgePlugin // Add this import statement
 
@@ -51,12 +47,6 @@ internal class ScanwedgePluginTest {
     // testLogger.i("ScanwedgePluginTest", "createProfile: ${hashMapToJsonString(argumentCaptor)}")
     
     Mockito.verify(mockResult).success("HONEYWELL")
-  }
-  fun hashMapToJsonString(map: HashMap<String, Any>): String {
-    val entriesAsString = map.entries.joinToString(", ") { (key, value) ->
-        "\"$key\": \"$value\""
-    }
-    return "{ $entriesAsString }"
   }
 }
 

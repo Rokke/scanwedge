@@ -66,7 +66,7 @@ class DatalogicPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
                 log?.e(TAG, "DatalogicPlugin.initialize, Exception: ${e.message}")
             }
         }
-        return false;
+        return false
     }
 
     override fun dispose(context: Context?) {

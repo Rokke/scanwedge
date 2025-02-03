@@ -19,7 +19,7 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
         log?.i(TAG, "onReceive: ${intent.toUri(0)}, ${intent.action}")
         if(intent.action.equals(ScanwedgePlugin.SCANWEDGE_ACTION)){
           log?.i(TAG, "SCANWEDGE_ACTION(${intent.extras})")
-          val labelType=intent.getStringExtra(RESULT_LABEL_TYPE);
+          val labelType=intent.getStringExtra(RESULT_LABEL_TYPE)
           val barcode=intent.getStringExtra(RESULT_BARCODE)
           if(barcode==null || labelType==null){
             log?.e(TAG, "barcode is null")
@@ -136,7 +136,7 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
           log?.d(TAG, "keeping default barcodes")
         }
       }
-      log?.d(TAG, "createProfile: enabledBarcodes: ${bParams.keySet().joinToString(", ", "{", "}"){it->"$it=${bParams[it]}"}}")
+      log?.d(TAG, "createProfile: enabledBarcodes: ${bParams.keySet().joinToString(", ", "{", "}"){ "$it=${bParams[it]}"}}")
       bBarcodePlugin.putBundle("PARAM_LIST", bParams)
       arrayBundleConfig.add(bBarcodePlugin)
       val enableKeyStroke=zebraConfig?.get("enableKeyStroke") ?: false
@@ -163,7 +163,7 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
       arrayList.add(bundleApp1)
       bMain.putParcelableArray("APP_LIST", arrayList.toTypedArray())
       bMain.putParcelableArrayList("PLUGIN_CONFIG", arrayBundleConfig)
-      log?.d(TAG, "createProfile: ${bMain.keySet().joinToString(", ", "{", "}"){it->"$it=${bMain[it]}"}}")
+      log?.d(TAG, "createProfile: ${bMain.keySet().joinToString(", ", "{", "}"){ "$it=${bMain[it]}"}}")
       val i = Intent().apply {
         action = DATAWEDGE_SEND_ACTION
         putExtra("com.symbol.datawedge.api.SET_CONFIG", bMain)

@@ -63,7 +63,7 @@ class HoneywellPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
                 log?.e(TAG, "Error in HoneywellPlugin: ${e.message}")
             }
         }
-        return false;
+        return false
     }
 
     override fun dispose(context: Context?) {
