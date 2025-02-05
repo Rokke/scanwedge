@@ -26,9 +26,17 @@ class ProfileModel {
 
 /// HoneywellProfileModel class
 /// This class extends the [ProfileModel] class
-/// This currently have no additional settings from the [ProfileModel] but it might have more options later
+/// [enableEanCheckDigitTransmission] allows the last (13th) digit of an EAN-13 to be sent to with the barcode data
 class HoneywellProfileModel extends ProfileModel {
-  HoneywellProfileModel({required super.profileName, super.enabledBarcodes, super.keepDefaults});
+  final bool enableEanCheckDigitTransmission;
+  HoneywellProfileModel({required super.profileName, this.enableEanCheckDigitTransmission = false, super.enabledBarcodes, super.keepDefaults});
+
+  @override
+  Map<String, dynamic> get customMap => {
+    'honeywell': {
+        'enableEanCheckDigitTransmission': enableEanCheckDigitTransmission,
+    },
+  };
 }
 
 /// ZebraProfileModel class

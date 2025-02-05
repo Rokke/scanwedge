@@ -13,6 +13,8 @@ class MyApp extends StatefulWidget {
 
   @override
   State<MyApp> createState() => _MyAppState();
+
+  final _demoProfileName = 'DemoProfile';
 }
 
 class _MyAppState extends State<MyApp> {
@@ -41,7 +43,7 @@ class _MyAppState extends State<MyApp> {
           await _scanwedgePlugin?.createScanProfile(
         switch (_scanwedgePlugin?.manufacturer) {
           'ZEBRA' => ZebraProfileModel(
-              profileName: 'DemoProfile',
+              profileName: widget._demoProfileName,
               enabledBarcodes: [
                 BarcodeConfig(barcodeType: BarcodeTypes.code39),
                 BarcodeConfig(barcodeType: BarcodeTypes.code128),
@@ -52,8 +54,17 @@ class _MyAppState extends State<MyApp> {
               enableKeyStroke: !notifierDisableKeystroke.value,
               aimType: notifierAimType.value,
             ),
+          'Honeywell' => HoneywellProfileModel(profileName: widget._demoProfileName,
+            enableEanCheckDigitTransmission: true,
+            enabledBarcodes: [
+              BarcodeConfig(barcodeType: BarcodeTypes.code39),
+              BarcodeConfig(barcodeType: BarcodeTypes.code128),
+              BarcodeConfig(barcodeType: BarcodeTypes.ean8),
+              BarcodeConfig(barcodeType: BarcodeTypes.ean13),
+            ],
+          ),
           _ => ProfileModel(
-              profileName: 'DemoProfile',
+              profileName: widget._demoProfileName,
               enabledBarcodes: [
                 BarcodeTypes.code39.create(),
                 BarcodeTypes.code128.create(minLength: 10, maxLength: 15),

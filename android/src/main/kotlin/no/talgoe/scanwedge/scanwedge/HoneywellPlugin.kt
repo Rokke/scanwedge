@@ -88,7 +88,6 @@ class HoneywellPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
                 putBoolean("TRIG_ENABLE", false)
             })
         })
-        // scanW.sendBroadcast(Intent(ACTION_RELEASE_SCANNER).apply{ setPackage("com.intermec.datacollectionservice") })
         return true
     }
     
@@ -100,16 +99,18 @@ class HoneywellPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
                 putBoolean("TRIG_ENABLE", true)
             })
         })
-        // scanW.sendBroadcast(Intent(ACTION_CLAIM_SCANNER).apply{ setPackage("com.intermec.datacollectionservice") })
         return true
     }
 
     override fun createProfile(name: String, enabledBarcodes: List<BarcodePlugin>?, hwConfig: HashMap<String,Any>?, keepDefaults: Boolean):Boolean {
         log?.i(TAG, "createProfile($name, $enabledBarcodes, $hwConfig, $keepDefaults)")
+        @Suppress("UNCHECKED_CAST")
+        val extraConfig = hwConfig?.get("honeywell") as HashMap<String, Boolean>
         val properties = Bundle().apply{
             putBoolean("DPR_DATA_INTENT", true)
             putString("DPR_DATA_INTENT_ACTION", ScanwedgePlugin.SCANWEDGE_ACTION)
             putString("DPR_DATA_INTENT_CATEGORY", "SCAN")
+            extraConfig["enableEanCheckDigitTransmission"]?.let { putBoolean("DEC_EAN13_CHECK_DIGIT_TRANSMIT", it) }
         }
         val honeywellDefaultTypes=BarcodeTypes.honeywellDefaultTypes().toMutableList()
         if(enabledBarcodes!=null){
