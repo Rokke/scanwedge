@@ -29,7 +29,13 @@ class ProfileModel {
 /// [enableEanCheckDigitTransmission] allows the last (13th) digit of an EAN-13 to be sent to with the barcode data
 class HoneywellProfileModel extends ProfileModel {
   final bool enableEanCheckDigitTransmission;
-  HoneywellProfileModel({required super.profileName, this.enableEanCheckDigitTransmission = false, super.enabledBarcodes, super.keepDefaults});
+
+  HoneywellProfileModel({
+    required super.profileName,
+    this.enableEanCheckDigitTransmission = true,
+    super.enabledBarcodes,
+    super.keepDefaults,
+  });
 
   @override
   Map<String, dynamic> get customMap => {
