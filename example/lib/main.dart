@@ -13,6 +13,8 @@ class MyApp extends StatefulWidget {
 
   @override
   State<MyApp> createState() => _MyAppState();
+
+  final _demoProfileName = 'DemoProfile';
 }
 
 class _MyAppState extends State<MyApp> {
@@ -37,17 +39,43 @@ class _MyAppState extends State<MyApp> {
 
   _createProfile() async {
     try {
-      log('_createProfile()-${await _scanwedgePlugin?.createScanProfile(_scanwedgePlugin?.manufacturer == 'ZEBRA' ? ZebraProfileModel(profileName: 'DemoProfile', enabledBarcodes: [
-            BarcodeConfig(barcodeType: BarcodeTypes.code39),
-            BarcodeConfig(barcodeType: BarcodeTypes.code128),
-            BarcodeConfig(barcodeType: BarcodeTypes.ean8),
-            BarcodeConfig(barcodeType: BarcodeTypes.ean13),
-            BarcodeConfig(barcodeType: BarcodeTypes.i2of5),
-          ], enableKeyStroke: !notifierDisableKeystroke.value, aimType: notifierAimType.value) : ProfileModel(profileName: 'DemoProfile', enabledBarcodes: [
-            BarcodeTypes.code39.create(),
-            BarcodeTypes.code128.create(minLength: 10, maxLength: 15),
-            BarcodeTypes.qrCode.create(),
-          ], keepDefaults: false))}');
+      final wasCreateProfileSuccessful =
+          await _scanwedgePlugin?.createScanProfile(
+        switch (_scanwedgePlugin?.manufacturer) {
+          'ZEBRA' => ZebraProfileModel(
+              profileName: widget._demoProfileName,
+              enabledBarcodes: [
+                BarcodeConfig(barcodeType: BarcodeTypes.code39),
+                BarcodeConfig(barcodeType: BarcodeTypes.code128),
+                BarcodeConfig(barcodeType: BarcodeTypes.ean8),
+                BarcodeConfig(barcodeType: BarcodeTypes.ean13),
+                BarcodeConfig(barcodeType: BarcodeTypes.i2of5),
+              ],
+              enableKeyStroke: !notifierDisableKeystroke.value,
+              aimType: notifierAimType.value,
+            ),
+          'Honeywell' => HoneywellProfileModel(profileName: widget._demoProfileName,
+            enableEanCheckDigitTransmission: true,
+            enabledBarcodes: [
+              BarcodeConfig(barcodeType: BarcodeTypes.code39),
+              BarcodeConfig(barcodeType: BarcodeTypes.code128),
+              BarcodeConfig(barcodeType: BarcodeTypes.ean8),
+              BarcodeConfig(barcodeType: BarcodeTypes.ean13),
+            ],
+          ),
+          _ => ProfileModel(
+              profileName: widget._demoProfileName,
+              enabledBarcodes: [
+                BarcodeTypes.code39.create(),
+                BarcodeTypes.code128.create(minLength: 10, maxLength: 15),
+                BarcodeTypes.qrCode.create(),
+              ],
+              keepDefaults: false,
+            ),
+        },
+      );
+
+      log('_createProfile()-$wasCreateProfileSuccessful');
     } catch (e) {
       log('_createProfile Exception: $e');
     }
@@ -95,7 +123,9 @@ class _MyAppState extends State<MyApp> {
                 'trigger' => _triggerScan(),
                 'enable' => _scanwedgePlugin?.enableScanner(),
                 'disable' => _scanwedgePlugin?.disableScanner(),
-                'battery' => _scanwedgePlugin?.getBatteryStatus().then((status) => log('Battery status: $status')),
+                'battery' => _scanwedgePlugin
+                    ?.getBatteryStatus()
+                    .then((status) => log('Battery status: $status')),
                 'exit' => exit(0),
                 _ => null,
               },
@@ -107,7 +137,8 @@ class _MyAppState extends State<MyApp> {
           // mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             // ElevatedButton(onPressed: _scanwedgePlugin.test, child: const Text('Create profile')),
-            Text(_deviceInfo ?? 'No device info', style: Theme.of(context).textTheme.labelSmall),
+            Text(_deviceInfo ?? 'No device info',
+                style: Theme.of(context).textTheme.labelSmall),
             Card(
                 child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -127,7 +158,12 @@ class _MyAppState extends State<MyApp> {
                             const SizedBox(width: 5),
                             ValueListenableBuilder(
                                 valueListenable: notifierDisableKeystroke,
-                                builder: (context, disableKeyboard, _) => Switch(value: disableKeyboard, onChanged: (value) => notifierDisableKeystroke.value = value)),
+                                builder: (context, disableKeyboard, _) =>
+                                    Switch(
+                                        value: disableKeyboard,
+                                        onChanged: (value) =>
+                                            notifierDisableKeystroke.value =
+                                                value)),
                           ],
                         ),
                         ValueListenableBuilder(
@@ -138,36 +174,66 @@ class _MyAppState extends State<MyApp> {
                                   itemBuilder: ((context) => AimType.values
                                       .map((e) => PopupMenuItem(
                                             value: e,
-                                            child: Text(e.toString().split('.').last),
+                                            child: Text(
+                                                e.toString().split('.').last),
                                           ))
                                       .toList()),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 4, horizontal: 8),
                                     decoration: BoxDecoration(
-                                        color: Colors.blue, borderRadius: BorderRadius.circular(5), boxShadow: const [BoxShadow(offset: Offset(2, 2), blurRadius: 1, color: Colors.black54)]),
+                                        color: Colors.blue,
+                                        borderRadius: BorderRadius.circular(5),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                              offset: Offset(2, 2),
+                                              blurRadius: 1,
+                                              color: Colors.black54)
+                                        ]),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Text('AimType:', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white)),
+                                        Text('AimType:',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(
+                                                    color: Colors.white)),
                                         Padding(
-                                          padding: const EdgeInsets.only(left: 6.0),
-                                          child: Text(aimType.toString().split('.').last, style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white)),
+                                          padding:
+                                              const EdgeInsets.only(left: 6.0),
+                                          child: Text(
+                                              aimType
+                                                  .toString()
+                                                  .split('.')
+                                                  .last,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge
+                                                  ?.copyWith(
+                                                      color: Colors.white)),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  onSelected: (newAimType) => notifierAimType.value = newAimType,
+                                  onSelected: (newAimType) =>
+                                      notifierAimType.value = newAimType,
                                 )),
                       ],
                     ),
                   ),
-                  ElevatedButton(onPressed: _createProfile, child: const Text('Create profile')),
+                  ElevatedButton(
+                      onPressed: _createProfile,
+                      child: const Text('Create profile')),
                 ],
               ),
             )),
             TextFormField(
-              decoration: const InputDecoration(hintText: 'auto inserted if keystroke and focused', contentPadding: EdgeInsets.symmetric(horizontal: 6)),
+              decoration: const InputDecoration(
+                  hintText: 'auto inserted if keystroke and focused',
+                  contentPadding: EdgeInsets.symmetric(horizontal: 6)),
             ),
             const Expanded(child: SizedBox()),
             Card(
@@ -187,7 +253,8 @@ class _MyAppState extends State<MyApp> {
                                         : snapshot.hasError
                                             ? snapshot.error.toString()
                                             : 'Scan something',
-                                    style: Theme.of(context).textTheme.titleMedium,
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
                                   ))),
                         ],
                       )
