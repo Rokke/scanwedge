@@ -105,7 +105,7 @@ class HoneywellPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
     override fun createProfile(name: String, enabledBarcodes: List<BarcodePlugin>?, hwConfig: HashMap<String,Any>?, keepDefaults: Boolean):Boolean {
         log?.i(TAG, "createProfile($name, $enabledBarcodes, $hwConfig, $keepDefaults)")
         @Suppress("UNCHECKED_CAST")
-        val extraConfig = hwConfig?.get("honeywell") as HashMap<String, Boolean>
+        val extraConfig = hwConfig?.get("honeywell") as? HashMap<String, Boolean> ?: hashMapOf()
         val properties = Bundle().apply{
             putBoolean("DPR_DATA_INTENT", true)
             putString("DPR_DATA_INTENT_ACTION", ScanwedgePlugin.SCANWEDGE_ACTION)

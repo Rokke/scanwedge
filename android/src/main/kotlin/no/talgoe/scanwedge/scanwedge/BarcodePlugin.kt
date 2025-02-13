@@ -10,7 +10,8 @@ class BarcodePlugin(val type: BarcodeTypes, private val minLength: Int?, private
         fun createBarcodePlugin(config: HashMap<String, Any>): BarcodePlugin? {
             Log.i("BarcodePlugin", "createBarcodePlugin: ${config["type"]}")
             // get the barcode type from the config, the type is a string with the value inside the code property of the BarcodeTypes enum
-            val type = BarcodeTypes.entries.find { it.code == config["type"] }
+            val type = BarcodeTypes.values().find { it.code == config["type"] }
+            // val type = BarcodeTypes.entries.find { it.code == config["type"] }   //This is experimental so waiting with this: Its usage must be marked with '@kotlin.ExperimentalStdlibApi' or '@OptIn(kotlin.ExperimentalStdlibApi::class)'
             if(type == null) {
                 Log.e("BarcodePlugin", "createBarcodePlugin: Invalid barcode type")
                 return null

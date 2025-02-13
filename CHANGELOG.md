@@ -37,3 +37,6 @@
 
 ## 1.0.3
 * Added newland support thanks to @M-Ahal
+
+## 1.0.4
+* Bugfix when creating a default profile on Honeywell device
