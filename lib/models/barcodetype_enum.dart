@@ -44,4 +44,11 @@ class BarcodeConfig {
       maxLength: map['maxLength'],
     );
   }
+  @override
+  String toString() => 'BarcodeConfig($barcodeType${minLength != null ? ',$minLength-$maxLength' : ''})';
+  @override
+  int get hashCode => barcodeType.hashCode ^ minLength.hashCode ^ maxLength.hashCode;
+
+  @override
+  bool operator ==(Object other) => other is BarcodeConfig && other.barcodeType == barcodeType && other.minLength == minLength && other.maxLength == maxLength;
 }

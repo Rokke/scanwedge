@@ -80,5 +80,5 @@ enum BatteryHealth {
         7 => BatteryHealth.unspecifiedFailure,
         _ => throw Exception('Unknown BatteryHealth: $value'),
       };
-  bool get isOK => this == BatteryHealth.good || this == BatteryHealth.cold; // Cold is given if fully charged
+  bool get isOK => this == BatteryHealth.good || this == BatteryHealth.cold || this == BatteryHealth.unknown; // Cold is given if fully charged
 }
