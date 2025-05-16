@@ -127,6 +127,15 @@ class ScanwedgeChannel {
     return null;
   }
 
+  Future<void> stopMonitoringBatteryStatus() async {
+    if (_streamBatteryController != null) {
+      log('stopMonitoringBatteryStatus: already monitoring');
+      _streamBatteryController?.close();
+      _streamBatteryController = null;
+    }
+    await _methodChannel.invokeMethod('stopMonitoringBatteryStatus');
+  }
+
   Future<Stream<ExtendedBatteryStatus>?> monitorBatteryStatus() async {
     if (_streamBatteryController != null) {
       log('monitorBatteryStatus: already monitoring');

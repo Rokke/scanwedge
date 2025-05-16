@@ -22,6 +22,9 @@ class BatteryMonitor(private val scanW: ScanwedgePlugin, private val log: Logger
         }
         Log.d(TAG, "monitorBatteryStatus: ${batteryStatus?.toUri(0)}")
     }
+    fun stopMonitoringBatteryStatus(context: Context) {
+        dispose(context)
+    }
 
     fun dispose(context: Context?) {
         if (isReceiverRegistered) {

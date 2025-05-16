@@ -89,6 +89,10 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
       batteryPlugin!!.monitorBatteryStatus(context!!)
       log?.i(TAG, "monitorBatteryStatus: $batteryPlugin")
       result.success(true)
+    }else if(call.method == "stopMonitoringBatteryStatus"){
+      batteryPlugin?.stopMonitoringBatteryStatus()
+      log?.i(TAG, "stopMonitoringBatteryStatus: $batteryPlugin")
+      result.success(true)
     }else if(call.method == "toggleScanning"){
       hardwarePlugin?.toggleScanning()
       result.success(true)

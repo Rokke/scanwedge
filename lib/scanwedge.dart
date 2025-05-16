@@ -100,6 +100,7 @@ class Scanwedge {
   Future<BatteryState> getBatteryStatus() => _scanwedgeChannel.getBatteryStatus();
   Future<ExtendedBatteryStatus?> getExtendedBatteryStatus() => _scanwedgeChannel.getExtendedBatteryStatus();
   Future<Stream<ExtendedBatteryStatus>?> monitorBatteryStatus() => _scanwedgeChannel.monitorBatteryStatus();
+  Future<void> stopMonitoringBatteryStatus() => _scanwedgeChannel.stopMonitoringBatteryStatus();
 
   /// Send basic simple commands to the DataWedge
   /// [command] is the command to be used
