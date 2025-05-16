@@ -28,6 +28,7 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
   private lateinit var channel : MethodChannel
   private var context: Context?=null
   private var hardwarePlugin: IHardwarePlugin?=null
+  private var batteryPlugin: BatteryMonitor?=null
 
   override fun sendScanResult(scanResult: ScanResult){
     log?.i(TAG, "sendScanResult: $scanResult")
@@ -37,6 +38,15 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
   override fun sendResult(data: Any?){
     log?.i(TAG, "sendResult: $data")
     channel.invokeMethod("result", data)
+  }
+  fun sendBatteryStatus(data: Map<String, Any?>?){
+    log?.i(TAG, "sendBatteryStatus: $data")
+    channel.invokeMethod("batteryStatus", data)
+  }
+
+  fun checkHardwarePlugin(key: String, value: Any): Pair<String, Any>? {
+    if (hardwarePlugin is IHardwareBatteryPlugin) return(hardwarePlugin as IHardwareBatteryPlugin).getBatteryValueMap(key, value)
+    return null
   }
 
   override fun getPackageName(): String{
@@ -70,6 +80,15 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
       result.success("${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}|${context?.packageName}|${Settings.Global.getString(context?.contentResolver, Settings.Global.DEVICE_NAME)}")
     }else if(call.method == "getBatteryStatus"){
       result.success(Utilities.getBatteryStatus(context!!))
+    }else if(call.method == "getExtendedBatteryStatus"){
+      val batteryStatus = Utilities.getExtendedBatteryStatus(context!!)
+      log?.i(TAG, "getExtendedBatteryStatus: $batteryStatus")
+      result.success(batteryStatus)
+    }else if(call.method == "monitorBatteryStatus"){
+      batteryPlugin = BatteryMonitor(this, log)
+      batteryPlugin!!.monitorBatteryStatus(context!!)
+      log?.i(TAG, "monitorBatteryStatus: $batteryPlugin")
+      result.success(true)
     }else if(call.method == "toggleScanning"){
       hardwarePlugin?.toggleScanning()
       result.success(true)
@@ -151,6 +170,7 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     hardwarePlugin?.dispose(context)
+    batteryPlugin?.dispose(context)
     channel.setMethodCallHandler(null)
   }
 }

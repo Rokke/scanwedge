@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:scanwedge/scanwedge.dart';
 
 class BatteryState {
   final int batteryLevel;
@@ -6,6 +7,17 @@ class BatteryState {
   final BatteryHealth health;
 
   BatteryState._({required this.batteryLevel, required this.status, required this.health});
+  factory BatteryState.fromJsonReceiver(Map<String, dynamic> json) {
+    debugPrint('BatteryState.fromJsonReceiver: $json');
+    if (json.isEmpty) {
+      throw Exception('Invalid batteryState');
+    }
+    return BatteryState._(
+      batteryLevel: json['batteryLevel'] ?? -1,
+      status: BatteryStatus.fromInt(json['status'] ?? 1),
+      health: BatteryHealth.fromInt(json['health'] ?? 1),
+    );
+  }
   factory BatteryState.fromReceiver(String batteryState) {
     if (batteryState.isEmpty) {
       throw Exception('Invalid batteryState');
@@ -40,45 +52,4 @@ class BatteryState {
 
   @override
   String toString() => 'BatteryState{batteryLevel: $batteryLevel, status: $status, health: $health}';
-}
-
-enum BatteryStatus {
-  charging,
-  discharging,
-  full,
-  notCharging,
-  unknown,
-  ;
-
-  static BatteryStatus fromInt(int value) => switch (value) {
-        2 => BatteryStatus.charging,
-        3 => BatteryStatus.discharging,
-        5 => BatteryStatus.full,
-        4 => BatteryStatus.notCharging,
-        1 => BatteryStatus.unknown,
-        _ => throw Exception('Unknown BatteryStatus: $value'),
-      };
-}
-
-enum BatteryHealth {
-  cold,
-  dead,
-  good,
-  overheat,
-  overVoltage,
-  unknown,
-  unspecifiedFailure,
-  ;
-
-  static BatteryHealth fromInt(int value) => switch (value) {
-        2 => BatteryHealth.cold,
-        4 => BatteryHealth.dead,
-        3 => BatteryHealth.good,
-        5 => BatteryHealth.overheat,
-        6 => BatteryHealth.overVoltage,
-        1 => BatteryHealth.unknown,
-        7 => BatteryHealth.unspecifiedFailure,
-        _ => throw Exception('Unknown BatteryHealth: $value'),
-      };
-  bool get isOK => this == BatteryHealth.good || this == BatteryHealth.cold || this == BatteryHealth.unknown; // Cold is given if fully charged
 }

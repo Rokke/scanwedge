@@ -21,7 +21,10 @@ class _MyAppState extends State<MyApp> {
   Scanwedge? _scanwedgePlugin;
   String? _deviceInfo;
   final notifierDisableKeystroke = ValueNotifier(true);
+  final notifierBatteryStatus = ValueNotifier<ExtendedBatteryStatus?>(null);
   final notifierAimType = ValueNotifier(AimType.trigger);
+  Stream<ExtendedBatteryStatus>? _batteryStream;
+  final listItems = <dynamic>[];
 
   @override
   void initState() {
@@ -30,11 +33,22 @@ class _MyAppState extends State<MyApp> {
       Scanwedge.initialize().then((scanwedge) {
         _scanwedgePlugin = scanwedge;
         _deviceInfo = scanwedge.deviceName;
+        _scanwedgePlugin?.stream.listen((scanResult) {
+          log('Scan result: $scanResult');
+          _addListItem(scanResult);
+        }, onError: (error) {
+          log('Error: $error');
+        });
         setState(() {});
       });
     } catch (e) {
       log('initState Exception: $e');
     }
+  }
+
+  @override
+  dispose() {
+    super.dispose();
   }
 
   _createProfile() async {
@@ -44,11 +58,9 @@ class _MyAppState extends State<MyApp> {
           'ZEBRA' => ZebraProfileModel(
               profileName: widget._demoProfileName,
               enabledBarcodes: [
-                BarcodeConfig(barcodeType: BarcodeTypes.code39),
-                BarcodeConfig(barcodeType: BarcodeTypes.code128),
-                BarcodeConfig(barcodeType: BarcodeTypes.ean8),
-                BarcodeConfig(barcodeType: BarcodeTypes.ean13),
-                BarcodeConfig(barcodeType: BarcodeTypes.i2of5),
+                BarcodeConfig(barcodeType: BarcodeTypes.datamatrix),
+                BarcodeConfig(barcodeType: BarcodeTypes.gs1DataBar),
+                BarcodeConfig(barcodeType: BarcodeTypes.gs1DataBarExpanded),
               ],
               enableKeyStroke: !notifierDisableKeystroke.value,
               aimType: notifierAimType.value,
@@ -69,6 +81,7 @@ class _MyAppState extends State<MyApp> {
                 BarcodeTypes.code39.create(),
                 BarcodeTypes.code128.create(minLength: 10, maxLength: 15),
                 BarcodeTypes.qrCode.create(),
+                BarcodeTypes.datamatrix.create(),
               ],
               keepDefaults: false,
             ),
@@ -81,12 +94,35 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  _addListItem(ScanResult item) {
+    debugPrint('Adding item: $item');
+    if (listItems.length > 10) {
+      listItems.removeAt(0);
+    }
+    listItems.insert(0, item);
+    setState(() {});
+  }
+
   _triggerScan() async {
     try {
       log('_triggerScan()-${await _scanwedgePlugin?.toggleScanning()}');
     } catch (e) {
       log('_triggerScan Exception: $e');
     }
+  }
+
+  void _activateBatteryMonitor() async {
+    if (_batteryStream != null) {
+      log('Battery monitor already active');
+      return;
+    }
+    _batteryStream = await _scanwedgePlugin?.monitorBatteryStatus();
+    _batteryStream?.listen((batteryStatus) {
+      log('Battery status: $batteryStatus');
+      notifierBatteryStatus.value = batteryStatus;
+    }, onError: (error) {
+      log('Error: $error');
+    });
   }
 
   @override
@@ -110,6 +146,11 @@ class _MyAppState extends State<MyApp> {
                   value: 'disable',
                   child: Text('Disable scanner'),
                 ),
+                PopupMenuItem(
+                  value: 'monitor',
+                  enabled: _batteryStream == null,
+                  child: Text(_batteryStream == null ? 'Activate monitor battery' : '🏃 Monitoring battery'),
+                ),
                 const PopupMenuItem(
                   value: 'exit',
                   child: Text('Exit application'),
@@ -123,7 +164,8 @@ class _MyAppState extends State<MyApp> {
                 'trigger' => _triggerScan(),
                 'enable' => _scanwedgePlugin?.enableScanner(),
                 'disable' => _scanwedgePlugin?.disableScanner(),
-                'battery' => _scanwedgePlugin?.getBatteryStatus().then((status) => log('Battery status: $status')),
+                'battery' => _scanwedgePlugin?.getExtendedBatteryStatus().then((status) => log('Battery status(${status?.batteryDecommissionThreshold}): $status')),
+                'monitor' => _activateBatteryMonitor(),
                 'exit' => exit(0),
                 _ => null,
               },
@@ -197,29 +239,76 @@ class _MyAppState extends State<MyApp> {
             TextFormField(
               decoration: const InputDecoration(hintText: 'auto inserted if keystroke and focused', contentPadding: EdgeInsets.symmetric(horizontal: 6)),
             ),
-            const Expanded(child: SizedBox()),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: _scanwedgePlugin != null
-                    ? Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Last scan:'),
-                          StreamBuilder(
-                              stream: _scanwedgePlugin!.stream,
-                              builder: ((context, snapshot) => Text(
-                                    snapshot.hasData
-                                        ? snapshot.data.toString()
-                                        : snapshot.hasError
-                                            ? snapshot.error.toString()
-                                            : 'Scan something',
-                                    style: Theme.of(context).textTheme.titleMedium,
-                                  ))),
-                        ],
-                      )
-                    : const Center(child: CircularProgressIndicator()),
+            ValueListenableBuilder(
+                valueListenable: notifierBatteryStatus,
+                builder: (context, batteryStatus, _) {
+                  debugPrint('Battery status rebuild');
+                  if (batteryStatus == null) {
+                    return const SizedBox.shrink();
+                  }
+                  return Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                        color: batteryStatus.batteryDecommissionStatus == BatteryDecommissionStatus.decommissionedBattery ? Colors.red : Colors.green,
+                        borderRadius: BorderRadius.circular(5),
+                        boxShadow: const [BoxShadow(offset: Offset(2, 2), blurRadius: 1, color: Colors.black54)]),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Battery: ${batteryStatus.batteryPercentage}%'),
+                            Text(batteryStatus.health.toString()),
+                            Text(batteryStatus.capacityLevel.toString()),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Serial: ${batteryStatus.serialNumber}'),
+                            Text('Part: ${batteryStatus.partNumber}'),
+                            Text('Mfd: ${batteryStatus.mfd?.toIso8601String().split('T').first}'),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Updated: ${batteryStatus.createdAt.toIso8601String().split('T').first}'),
+                            Text('Cycles: ${batteryStatus.cycleCount}'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+            Flexible(
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: listItems.isEmpty
+                      ? const Center(child: Text('No scans available'))
+                      : Column(
+                          children: [
+                            const Text('Last scan:'),
+                            Flexible(
+                                child: ListView.builder(
+                                    itemCount: listItems.length,
+                                    itemBuilder: (context, index) {
+                                      final item = listItems[index];
+                                      return switch (item) {
+                                        (ScanResult scanResult) => ListTile(title: Text(scanResult.barcode), subtitle: Text(scanResult.barcodeType.name)),
+                                        (ExtendedBatteryStatus batteryStatus) => ListTile(
+                                            title: Text('Battery status: ${batteryStatus.batteryPercentage}%'),
+                                            subtitle: Text('Battery decommission: ${batteryStatus.batteryDecommissionStatus}'),
+                                          ),
+                                        _ => throw Exception('Unknown item type'),
+                                      };
+                                    }))
+                          ],
+                        ),
+                ),
               ),
             ),
           ],

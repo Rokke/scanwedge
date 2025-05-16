@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:scanwedge/models/batterystate.dart';
+import 'package:scanwedge/models/extendedbatterystatus.dart';
 import 'package:scanwedge/models/profile_model.dart';
 import 'package:scanwedge/models/scanprofile.dart';
 import 'package:scanwedge/models/scanresult.dart';
@@ -12,6 +13,7 @@ import 'package:scanwedge/scanwedge_channel.dart';
 export 'package:scanwedge/models/aimtype.dart';
 export 'package:scanwedge/models/barcode_plugin.dart';
 export 'package:scanwedge/models/barcodetype_enum.dart';
+export 'package:scanwedge/models/extendedbatterystatus.dart';
 export 'package:scanwedge/models/plugin_names.dart';
 export 'package:scanwedge/models/profile_model.dart';
 export 'package:scanwedge/models/scanprofile.dart';
@@ -96,6 +98,8 @@ class Scanwedge {
   Future<String?> getDeviceInfo() => Future.value('DEPRECATED');
 
   Future<BatteryState> getBatteryStatus() => _scanwedgeChannel.getBatteryStatus();
+  Future<ExtendedBatteryStatus?> getExtendedBatteryStatus() => _scanwedgeChannel.getExtendedBatteryStatus();
+  Future<Stream<ExtendedBatteryStatus>?> monitorBatteryStatus() => _scanwedgeChannel.monitorBatteryStatus();
 
   /// Send basic simple commands to the DataWedge
   /// [command] is the command to be used

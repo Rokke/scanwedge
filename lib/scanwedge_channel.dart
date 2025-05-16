@@ -13,6 +13,8 @@ class ScanwedgeChannel {
   static const channel = 'scanwedge';
   static const _methodChannel = MethodChannel(channel);
   final _streamController = StreamController<ScanResult>.broadcast();
+  StreamController<ExtendedBatteryStatus>? _streamBatteryController;
+  ExtendedBatteryStatus? _latestExtendedBatteryStatus;
   final SupportedDevice supportedDevice;
   final String manufacturer, modelName, productName, osVersion, packageName, deviceName;
   String? _lastCompleterError;
@@ -87,6 +89,11 @@ class ScanwedgeChannel {
           }
           log('result: ${completerSendCommandBundle?.future}');
           break;
+        case "batteryStatus":
+          debugPrint("batteryStatus method ${call.arguments}");
+          _latestExtendedBatteryStatus = ExtendedBatteryStatus.fromJson(Map<String, dynamic>.from(call.arguments));
+          _streamBatteryController?.add(_latestExtendedBatteryStatus!);
+          break;
         default:
           debugPrint("invalid method: ${call.method}-${call.arguments}");
           break;
@@ -110,6 +117,31 @@ class ScanwedgeChannel {
   }
 
   Future<BatteryState> getBatteryStatus() async => BatteryState.fromReceiver(await _methodChannel.invokeMethod<String>('getBatteryStatus') ?? '');
+  Future<ExtendedBatteryStatus?> getExtendedBatteryStatus() async {
+    if (_streamBatteryController != null) return _latestExtendedBatteryStatus;
+    final dynamic result = await _methodChannel.invokeMethod('getExtendedBatteryStatus');
+    debugPrint('getExtendedBatteryStatus: ${result.runtimeType}');
+    if (result != null) {
+      return ExtendedBatteryStatus.fromJson(Map<String, dynamic>.from(result));
+    }
+    return null;
+  }
+
+  Future<Stream<ExtendedBatteryStatus>?> monitorBatteryStatus() async {
+    if (_streamBatteryController != null) {
+      log('monitorBatteryStatus: already monitoring');
+      return _streamBatteryController!.stream;
+    }
+    _streamBatteryController = StreamController<ExtendedBatteryStatus>.broadcast();
+    _streamBatteryController!.onCancel = () {
+      log('monitorBatteryStatus: onCancel');
+      _streamBatteryController?.close();
+      _streamBatteryController = null;
+    };
+    final dynamic result = await _methodChannel.invokeMethod('monitorBatteryStatus');
+    debugPrint('monitorBatteryStatus: ${result.runtimeType}, $result');
+    return _streamBatteryController!.stream;
+  }
 
   @Deprecated('This is for backwards compatibility and only support Zebra devices, this will be removed later')
   Future<bool> sendCommand({required String command, required String parameter}) async =>
