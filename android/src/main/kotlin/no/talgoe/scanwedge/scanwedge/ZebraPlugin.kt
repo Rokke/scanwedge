@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.util.Log
+
 
 // Hardware plugin for Zebra devices that extends the IHardwarePlugin interface.
 class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) : IHardwarePlugin{
@@ -12,6 +14,8 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
     private val NOTIFICATION_ACTION = "com.symbol.datawedge.api.NOTIFICATION_ACTION"
     private val RESULT_LABEL_TYPE="com.symbol.datawedge.label_type"
     private val RESULT_BARCODE="com.symbol.datawedge.data_string"
+    private val RESULT_BARCODE_RAW_DATA="com.symbol.datawedge.decode_data"
+    private val RESULT_BARCODE_TOKEN_DATA="com.symbol.datawedge.tokenized_data"
     private val RESULT_ACTION = "com.symbol.datawedge.api.RESULT_ACTION"
     private val TAG="ZebraPlugin"
     private val barcodeDataReceiver = object : BroadcastReceiver() {
@@ -19,12 +23,22 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
         log?.i(TAG, "onReceive: ${intent.toUri(0)}, ${intent.action}")
         if(intent.action.equals(ScanwedgePlugin.SCANWEDGE_ACTION)){
           log?.i(TAG, "SCANWEDGE_ACTION(${intent.extras})")
-          val labelType=intent.getStringExtra(RESULT_LABEL_TYPE)
-          val barcode=intent.getStringExtra(RESULT_BARCODE)
+          val labelType=intent.getStringExtra(RESULT_LABEL_TYPE) ?: ""
+          val barcode=intent.getStringExtra(RESULT_BARCODE) ?: ""
+//          val rawData =
+//            intent.getSerializableExtra(RESULT_BARCODE_RAW_DATA) as ArrayList<ByteArray>
+          val rawData = null
+          Log.d(TAG, "onReceive: labelType=$labelType, barcode=$barcode, intent=${intent.extras?.keySet()?.joinToString(", ", "{", "}"){ "$it=${intent.extras?.get(it)}" }}")
           if(barcode==null || labelType==null){
             log?.e(TAG, "barcode is null")
           }else{
-            scanW.sendScanResult(ScanResult(barcode, BarcodeTypes.fromZebraCode(labelType), labelType))
+            val tokens = intent
+              .getParcelableArrayListExtra<Bundle>(RESULT_BARCODE_TOKEN_DATA)
+            val tokenMap: Map<String, String>? = tokens?.associate { bundle ->
+              bundle.getString("token_id", "") to bundle.getString("token_string_data", "")
+            }
+
+            scanW.sendScanResult(ScanResult(barcode, BarcodeTypes.fromZebraCode(labelType), labelType, tokenMap))
             // remove the start "LABEL-TYPE-" from the labelType and send the remaining string
             // channel.invokeMethod("scan", mapOf("barcode" to intent.getStringExtra(RESULT_BARCODE),"labelType" to labelType?.substring(11)))
           }
@@ -43,7 +57,7 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
           log?.i(TAG, "DATAWEDGE_SEND_ACTION(${intent.extras})")
         }
         else if(intent.action.equals(NOTIFICATION_ACTION)){
-          log?.i(TAG, "NOTIFICATION_ACTION(${intent.extras})")   
+          log?.i(TAG, "NOTIFICATION_ACTION(${intent.extras})")
         }
       }
     }
@@ -115,6 +129,18 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
       val bParams = Bundle()
       bParams.putString("scanner_selection","auto")
       bParams.putString("scanner_input_enabled","true")
+      bParams.putString("decoder_datamatrix",     "true")
+      bParams.putString("decoder_code128",     "true")
+      bParams.putString("decoder_gs1",         "true")
+      bParams.putString("decoder_qrcode",         "true")
+      bParams.putString("add_group_separator", "true")
+      bParams.putString("enable_udi_gs1",        "true")
+//      bParams.putString("scanning_mode",        "2") // UDI mode (scan only UDI barcodes, e.g. GS1 DataBar)
+
+      bParams.putString("scanning_mode",      "3")        // Multi-barcode mode (scan both UDI and non-UDI barcodes, e.g. QR)
+      bParams.putString("multi_barcode_count","2")        // decode exactly 2 barcodes, TODO adjust
+      bParams.putString("instant_reporting_enable", "true") // option: report each as scanned
+
       val sAimType=convertAimTypeToIndex(zebraConfig?.get("aimType") as? String)
       if(sAimType!=null){
         log?.i(TAG, "createProfile: aimType set: $sAimType")
@@ -156,6 +182,40 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
           putInt("intent_delivery", 2)
         })
       })
+
+      val tokenOrder = listOf("di","17","10").map { ai ->
+        Bundle().apply {
+          putString("name",    when(ai){
+            "di" -> "gtin"
+            "17" -> "expiration_date_original"
+            "10" -> "lot_number"
+            else -> ai
+          })
+          putString("enabled", "true")
+        }
+      }
+
+      val tokenParams = Bundle().apply {
+        putString("gs1_send_token_option",  "BARCODES_TOKENS")
+        putString("gs1_token_separator",    "LF")
+        putParcelableArrayList(
+          "gs1_token_order",
+          ArrayList(tokenOrder)
+        )
+      }
+
+//      tokenParams.putParcelableArrayList("gs1_token_order", gs1Order)
+
+      val tokenPlugin = Bundle().apply {
+        putString("PLUGIN_NAME",        "TOKEN")
+        putString("RESET_CONFIG",       "true")
+        putBundle("PARAM_LIST",         tokenParams)
+        putString("OUTPUT_PLUGIN_NAME", "INTENT")
+      }
+
+
+      arrayBundleConfig.add(tokenPlugin)
+
       val bundleApp1 = Bundle()
       bundleApp1.putString("PACKAGE_NAME", scanW.getPackageName())
       bundleApp1.putStringArray("ACTIVITY_LIST", arrayOf("*"))
@@ -163,6 +223,7 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
       arrayList.add(bundleApp1)
       bMain.putParcelableArray("APP_LIST", arrayList.toTypedArray())
       bMain.putParcelableArrayList("PLUGIN_CONFIG", arrayBundleConfig)
+
       log?.d(TAG, "createProfile: ${bMain.keySet().joinToString(", ", "{", "}"){ "$it=${bMain[it]}"}}")
       val i = Intent().apply {
         action = DATAWEDGE_SEND_ACTION
@@ -253,3 +314,11 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
       return true
     }
   }
+
+// Helper to build each gs1_token_order entry
+private fun makeTokenOrder(name: String, enabled: Boolean): Bundle {
+  val b = Bundle()
+  b.putString("name", name)
+  b.putString("enabled", enabled.toString())
+  return b
+}

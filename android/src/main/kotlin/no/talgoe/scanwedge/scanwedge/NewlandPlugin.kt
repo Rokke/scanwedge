@@ -30,7 +30,7 @@ class NewlandPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?
                 val barcodeType = BarcodeTypes.fromNewlandCode(codeId)
 
                 log?.i(TAG, "Barcode Data: $barcodeData, Barcode Type: $barcodeType")
-                scanW.sendScanResult(ScanResult(barcodeData, barcodeType, codeId))
+                scanW.sendScanResult(ScanResult(barcodeData, barcodeType, codeId, null))
             } catch (e: Exception) {
                 log?.e(TAG, "Error in barcodeDataReceiver: ${e.message}")
             }

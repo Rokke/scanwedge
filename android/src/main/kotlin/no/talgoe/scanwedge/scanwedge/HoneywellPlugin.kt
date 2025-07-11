@@ -37,7 +37,7 @@ class HoneywellPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
                     log?.e(TAG, "barcode is null")
                 }else{
                     log?.i(TAG, "Barcode Data: $barcode, $charset, $codeId, $aimId, $timestamp")
-                    scanW.sendScanResult(ScanResult(barcode, BarcodeTypes.fromHoneywellCode(codeId), codeId))
+                    scanW.sendScanResult(ScanResult(barcode, BarcodeTypes.fromHoneywellCode(codeId), codeId, null))
                 }
                 }else{
                 log?.w(TAG, "onReceive: invalid version $version")

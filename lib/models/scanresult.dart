@@ -4,16 +4,59 @@ class ScanResult {
   final String barcode;
   final BarcodeTypes barcodeType;
   final String hardwareLabelType;
+  final Map<String, String>? tokenMap;
 
-  ScanResult({required this.barcode, required this.barcodeType, required this.hardwareLabelType});
-  factory ScanResult.fromDatawedge(dynamic json) => ScanResult(
-      barcode: json['barcode'],
-      barcodeType: BarcodeTypes.values.firstWhere((element) => element.name == json['barcodeType'], orElse: () => BarcodeTypes.unknown),
-      hardwareLabelType: json['hardwareLabelType']);
-  ScanResult copyWith({String? barcode, BarcodeTypes? barcodeType, String? hardwareLabelType}) =>
-      ScanResult(barcode: barcode ?? this.barcode, barcodeType: barcodeType ?? this.barcodeType, hardwareLabelType: hardwareLabelType ?? this.hardwareLabelType);
+  ScanResult({
+    required this.barcode,
+    required this.barcodeType,
+    required this.hardwareLabelType,
+    required this.tokenMap,
+  });
+
+  factory ScanResult.fromDatawedge(dynamic json) {
+    // parse token: Map<String,String>?
+    Map<String, String>? parsedTokenMap;
+    if (json['tokens'] != null) {
+      parsedTokenMap = Map<String, String>.from(json['tokens'] as Map);
+    }
+
+    return ScanResult(
+      barcode: json['barcode'] as String,
+      barcodeType: BarcodeTypes.values.firstWhere(
+        (e) => e.name == json['barcodeType'],
+        orElse: () => BarcodeTypes.unknown,
+      ),
+      hardwareLabelType: json['hardwareLabelType'] as String,
+      tokenMap: parsedTokenMap,
+    );
+  }
+
+  ScanResult copyWith({
+    String? barcode,
+    BarcodeTypes? barcodeType,
+    String? hardwareLabelType,
+    Map<String, String>? tokenMap,
+  }) =>
+      ScanResult(
+        barcode: barcode ?? this.barcode,
+        barcodeType: barcodeType ?? this.barcodeType,
+        hardwareLabelType: hardwareLabelType ?? this.hardwareLabelType,
+        tokenMap: tokenMap ?? this.tokenMap,
+      );
+
   @override
   String toString() => 'ScanResult($barcode:$barcodeType)';
+
+  String toStringLong() {
+    final tokenStr =
+        tokenMap != null ? tokenMap!.entries.map((e) => '${e.key}: ${e.value}').join(', ') : 'null';
+    return 'ScanResult('
+        'barcode: $barcode, '
+        'barcodeType: $barcodeType, '
+        'hardwareLabelType: $hardwareLabelType, '
+        'tokenMap: $tokenStr'
+        ')';
+  }
 }
 
 @Deprecated('Use BarcodeLabelType instead')
