@@ -16,6 +16,6 @@ class ScanResult(
     }
 
     override fun toString(): String {
-        return "ScanResult(barcode='$barcode', barcodeType=$barcodeType, hardwareLabelType='$hardwareLabelType', rawBarcodeData=$rawBarcodeData, tokenMap=$tokenMap)"
+        return "ScanResult(barcode='$barcode', barcodeType=$barcodeType, hardwareLabelType='$hardwareLabelType', tokenMap=$tokenMap)"
     }
 }

@@ -43,13 +43,13 @@ class _MyAppState extends State<MyApp> {
         switch (_scanwedgePlugin?.manufacturer.toUpperCase().split(' ').first) {
           'ZEBRA' => ZebraProfileModel(
               profileName: widget._demoProfileName,
-              enabledBarcodes: [
-                BarcodeConfig(barcodeType: BarcodeTypes.code39),
-                BarcodeConfig(barcodeType: BarcodeTypes.code128),
-                BarcodeConfig(barcodeType: BarcodeTypes.ean8),
-                BarcodeConfig(barcodeType: BarcodeTypes.ean13),
-                BarcodeConfig(barcodeType: BarcodeTypes.i2of5),
-              ],
+              // enabledBarcodes: [
+              //   BarcodeConfig(barcodeType: BarcodeTypes.code39),
+              //   BarcodeConfig(barcodeType: BarcodeTypes.code128),
+              //   BarcodeConfig(barcodeType: BarcodeTypes.ean8),
+              //   BarcodeConfig(barcodeType: BarcodeTypes.ean13),
+              //   BarcodeConfig(barcodeType: BarcodeTypes.i2of5),
+              // ],
               enableKeyStroke: !notifierDisableKeystroke.value,
               aimType: notifierAimType.value,
             ),

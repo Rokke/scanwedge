@@ -35,12 +35,12 @@ class DatalogicPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
                     }else if(extra is ByteArray){   // Prefer extra data if available since barcode data might have keyboard wedge prefix/suffix
                         val extraString=String(extra)
                         log?.i(TAG, "extra: ${extra.size}, $extraString, $codeId, $timestamp")
-                        scanW.sendScanResult(ScanResult(extraString, BarcodeTypes.fromDatalogicCode(codeId), codeId, null, null))
+                        scanW.sendScanResult(ScanResult(extraString, BarcodeTypes.fromDatalogicCode(codeId), codeId, null))
                     }else if(barcode==null){
                         log?.e(TAG, "no barcode or extra data, $codeId, $timestamp")
                     }else{
                         log?.i(TAG, "Barcode Data: $barcode, $codeId, $timestamp")
-                        scanW.sendScanResult(ScanResult(barcode, BarcodeTypes.fromDatalogicCode(codeId), codeId, null, null))
+                        scanW.sendScanResult(ScanResult(barcode, BarcodeTypes.fromDatalogicCode(codeId), codeId, null))
                     }
                 }
             } catch (e: Exception) {

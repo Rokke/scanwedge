@@ -38,7 +38,7 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
               bundle.getString("token_id", "") to bundle.getString("token_string_data", "")
             }
 
-            scanW.sendScanResult(ScanResult(barcode, BarcodeTypes.fromZebraCode(labelType), labelType, rawData, tokenMap))
+            scanW.sendScanResult(ScanResult(barcode, BarcodeTypes.fromZebraCode(labelType), labelType, tokenMap))
             // remove the start "LABEL-TYPE-" from the labelType and send the remaining string
             // channel.invokeMethod("scan", mapOf("barcode" to intent.getStringExtra(RESULT_BARCODE),"labelType" to labelType?.substring(11)))
           }
@@ -132,9 +132,15 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
       bParams.putString("decoder_datamatrix",     "true")
       bParams.putString("decoder_code128",     "true")
       bParams.putString("decoder_gs1",         "true")
+      bParams.putString("decoder_qrcode",         "true")
       bParams.putString("add_group_separator", "true")
       bParams.putString("enable_udi_gs1",        "true")
-      bParams.putString("scanning_mode",        "2")
+//      bParams.putString("scanning_mode",        "2") // UDI mode (scan only UDI barcodes, e.g. GS1 DataBar)
+
+      bParams.putString("scanning_mode",      "3")        // Multi-barcode mode (scan both UDI and non-UDI barcodes, e.g. QR)
+      bParams.putString("multi_barcode_count","2")        // decode exactly 2 barcodes, TODO adjust
+      bParams.putString("instant_reporting_enable", "true") // option: report each as scanned
+
       val sAimType=convertAimTypeToIndex(zebraConfig?.get("aimType") as? String)
       if(sAimType!=null){
         log?.i(TAG, "createProfile: aimType set: $sAimType")
