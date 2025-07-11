@@ -4,35 +4,30 @@ class ScanResult {
   final String barcode;
   final BarcodeTypes barcodeType;
   final String hardwareLabelType;
-  final List<int>? rawBarcodeData;
-  final List<Map<String, String>>? tokens;
+  final Map<String, String>? tokenMap;
 
   ScanResult({
     required this.barcode,
     required this.barcodeType,
     required this.hardwareLabelType,
-    required this.rawBarcodeData,
-    required this.tokens,
+    required this.tokenMap,
   });
 
   factory ScanResult.fromDatawedge(dynamic json) {
-    // parse tokens: List<Map<String,String>>
-    List<Map<String, String>>? parsedTokens;
+    // parse token: Map<String,String>?
+    Map<String, String>? parsedTokenMap;
     if (json['tokens'] != null) {
-      parsedTokens =
-          (json['tokens'] as List).map((e) => Map<String, String>.from(e as Map)).toList();
+      parsedTokenMap = Map<String, String>.from(json['tokens'] as Map);
     }
 
     return ScanResult(
       barcode: json['barcode'] as String,
       barcodeType: BarcodeTypes.values.firstWhere(
-        (element) => element.name == json['barcodeType'],
+        (e) => e.name == json['barcodeType'],
         orElse: () => BarcodeTypes.unknown,
       ),
       hardwareLabelType: json['hardwareLabelType'] as String,
-      rawBarcodeData:
-          json['rawBarcodeData'] != null ? List<int>.from(json['rawBarcodeData'] as List) : null,
-      tokens: parsedTokens,
+      tokenMap: parsedTokenMap,
     );
   }
 
@@ -40,30 +35,26 @@ class ScanResult {
     String? barcode,
     BarcodeTypes? barcodeType,
     String? hardwareLabelType,
-    List<int>? rawBarcodeData,
-    List<Map<String, String>>? tokens,
+    Map<String, String>? tokenMap,
   }) =>
       ScanResult(
         barcode: barcode ?? this.barcode,
         barcodeType: barcodeType ?? this.barcodeType,
         hardwareLabelType: hardwareLabelType ?? this.hardwareLabelType,
-        rawBarcodeData: rawBarcodeData ?? this.rawBarcodeData,
-        tokens: tokens ?? this.tokens,
+        tokenMap: tokenMap ?? this.tokenMap,
       );
 
   @override
   String toString() => 'ScanResult($barcode:$barcodeType)';
 
   String toStringLong() {
-    final rawHex =
-        rawBarcodeData?.map((b) => b.toRadixString(16).padLeft(2, '0')).join(', ') ?? 'null';
-    final tokenStr = tokens?.map((t) => '(${t['ai']}: ${t['value']})').join(', ') ?? 'null';
+    final tokenStr =
+        tokenMap != null ? tokenMap!.entries.map((e) => '${e.key}: ${e.value}').join(', ') : 'null';
     return 'ScanResult('
         'barcode: $barcode, '
         'barcodeType: $barcodeType, '
         'hardwareLabelType: $hardwareLabelType, '
-        'rawBarcodeData: [$rawHex], '
-        'tokens: [$tokenStr]'
+        'tokenMap: $tokenStr'
         ')';
   }
 }
