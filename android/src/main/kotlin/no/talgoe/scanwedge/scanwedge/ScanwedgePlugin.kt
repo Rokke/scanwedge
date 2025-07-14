@@ -74,6 +74,10 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
     context=flutterPluginBinding.applicationContext
   }
 
+  fun fetchManufacturer(): String? {
+    return hardwarePlugin?.apiVersion ?: android.os.Build.MANUFACTURER?.uppercase()?.split(" ")?.get(0)
+  }
+
   override fun onMethodCall(call: MethodCall, result: Result) {
     log?.d(TAG, "onMethodCall: ${call.method}, ${call.arguments}")
     if (call.method == "getDeviceInfo") {
@@ -81,7 +85,7 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
     }else if(call.method == "getBatteryStatus"){
       result.success(Utilities.getBatteryStatus(context!!))
     }else if(call.method == "getExtendedBatteryStatus"){
-      val batteryStatus = Utilities.getExtendedBatteryStatus(context!!)
+      val batteryStatus = Utilities.getExtendedBatteryStatus(context!!, this, log)
       log?.i(TAG, "getExtendedBatteryStatus: $batteryStatus")
       result.success(batteryStatus)
     }else if(call.method == "monitorBatteryStatus"){
@@ -90,7 +94,7 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
       log?.i(TAG, "monitorBatteryStatus: $batteryPlugin")
       result.success(true)
     }else if(call.method == "stopMonitoringBatteryStatus"){
-      batteryPlugin?.stopMonitoringBatteryStatus()
+      batteryPlugin?.stopMonitoringBatteryStatus(context!!)
       log?.i(TAG, "stopMonitoringBatteryStatus: $batteryPlugin")
       result.success(true)
     }else if(call.method == "toggleScanning"){

@@ -11,7 +11,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 
 // Hardware plugin for Zebra devices that extends the IHardwarePlugin interface.
-class HoneywellPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) : IHardwarePlugin {
+class HoneywellPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) : IHardwarePlugin, IHardwareBatteryPlugin {
     // private val ACTION_BARCODE_DATA = "com.honeywell.sample.action.BARCODE_DATA"
     // private val SCANWEDGE_ACTION="no.talgoe.scanwedge.SCAN"
     private val ACTION_RELEASE_SCANNER = "com.honeywell.aidc.action.ACTION_RELEASE_SCANNER"
@@ -47,6 +47,13 @@ class HoneywellPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
             log?.e(TAG, "Error in barcodeDataReceiver: ${e.message}")
         }
         }
+    }
+    override fun getBatteryValueMap(key: String, value: Any): Pair<String, Any>?{
+      return when(key){
+        "BatterySwapping"->"batterySwapping" to value
+        "backup_battery_voltage"->"backupBatteryVoltage" to value
+        else->null
+      }
     }
     override val apiVersion: String get() = "HONEYWELL"
 

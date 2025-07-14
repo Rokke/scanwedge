@@ -27,12 +27,13 @@ class ScanwedgeChannel {
     debugPrint('Scanwedge: $supportedDevice, $deviceName');
   }
   Stream<ScanResult> get stream => _streamController.stream;
+  static bool get isAndroid => !kIsWeb && Platform.isAndroid;
 
   /// Returns if the given device is supported. This will also be used when calling the different methods
   /// Returns `null` if the device is not supported
   static Future<ScanwedgeChannel> initialize() async {
     try {
-      if (!kIsWeb && Platform.isAndroid) {
+      if (isAndroid) {
         final supportedResponse = await _methodChannel.invokeMethod<String>('initializeDataWedge');
         debugPrint('initializeDataWedge: $supportedResponse');
         if (supportedResponse != null) {
@@ -90,7 +91,7 @@ class ScanwedgeChannel {
           log('result: ${completerSendCommandBundle?.future}');
           break;
         case "batteryStatus":
-          debugPrint("batteryStatus method ${call.arguments}");
+          // debugPrint("batteryStatus method ${call.arguments}");
           _latestExtendedBatteryStatus = ExtendedBatteryStatus.fromJson(Map<String, dynamic>.from(call.arguments));
           _streamBatteryController?.add(_latestExtendedBatteryStatus!);
           break;
@@ -118,6 +119,10 @@ class ScanwedgeChannel {
 
   Future<BatteryState> getBatteryStatus() async => BatteryState.fromReceiver(await _methodChannel.invokeMethod<String>('getBatteryStatus') ?? '');
   Future<ExtendedBatteryStatus?> getExtendedBatteryStatus() async {
+    if (!isAndroid) {
+      debugPrint('getExtendedBatteryStatus: not supported on this platform');
+      return null;
+    }
     if (_streamBatteryController != null) return _latestExtendedBatteryStatus;
     final dynamic result = await _methodChannel.invokeMethod('getExtendedBatteryStatus');
     debugPrint('getExtendedBatteryStatus: ${result.runtimeType}');
@@ -132,11 +137,15 @@ class ScanwedgeChannel {
       log('stopMonitoringBatteryStatus: already monitoring');
       _streamBatteryController?.close();
       _streamBatteryController = null;
+      await _methodChannel.invokeMethod('stopMonitoringBatteryStatus');
     }
-    await _methodChannel.invokeMethod('stopMonitoringBatteryStatus');
   }
 
   Future<Stream<ExtendedBatteryStatus>?> monitorBatteryStatus() async {
+    if (!isAndroid) {
+      debugPrint('monitorBatteryStatus: not supported on this platform');
+      return null;
+    }
     if (_streamBatteryController != null) {
       log('monitorBatteryStatus: already monitoring');
       return _streamBatteryController!.stream;

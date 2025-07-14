@@ -48,30 +48,19 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
       }
     }
     override fun getBatteryValueMap(key: String, value: Any): Pair<String, Any>?{
-      /*
-        #Intent;action=android.intent.action.BATTERY_CHANGED;launchFlags=0x60000010;i.battery_usage_numb=18;i.battery_error_status=0;i.battery_type=206;S.technology=Li-ion;i.battery_usage_decommission_threshold=400;i.icon-small=17303637;
-        i.max_charging_voltage=5000000;S.zcm_mode=;i.health=2;i.shutdown_level=4;B.zcm_enabled=false;i.max_discharge_temp_shutdown_level=600;i.max_charging_current=500000;i.adjust_shutdown_level=100;i.status=2;i.low_level=18;i.ratedcapacity=3300;
-        i.plugged=2;B.present=true;S.mfd=2023-02-02;i.seq=5896;S.zcm_extra=;i.charge_counter=3335150;i.level=100;i.base_cumulative_charge=61149;i.scale=100;S.partnumber=BT-000409-50%20R.B;i.critical_level=10;i.temperature=330;i.voltage=4339;
-        i.min_discharge_temp_shutdown_level=-200;S.serialnumber=T5362;i.invalid_charger=0;B.battery_low=false;i.battery_decommission=0;end, android.intent.action.BATTERY_CHANGED
-      */
       return when(key){
         "shutdown_level"->"shutdownLevel" to value                                              // Unknown Zebra shutdown_level: The level at which the battery will shut down
         "max_discharge_temp_shutdown_level"->"maxDischargeTempShutdownLevel" to (value as Int / 10).toDouble() // Unknown Zebra max_discharge_temp_shutdown_level: The maximum discharge temperature at which the battery will shut down
         "adjust_shutdown_level"->"adjustShutdownLevel" to value                                 // Unknown Zebra adjust_shutdown_level: The level at which the battery will adjust its shutdown
         "min_discharge_temp_shutdown_level"->"minDischargeTempShutdownLevel" to (value as Int/ 10).toDouble() // Unknown Zebra min_discharge_temp_shutdown_level: The minimum discharge temperature at which the battery will shut down
-        "invalid_charger"->"invalidCharger" to value                                            // Unknown Zebra invalid_charger: Indicates if the charger is invalid
         "low_level"->"lowLevel" to value                                                        // Unknown Zebra low_level: The low level of the battery
-        "seq"->"seq" to value                                                                   // Unknown Zebra seq: The sequence number of the battery
         "critical_level"->"criticalLevel" to value                                              // Unknown Zebra critical_level: The critical level of the battery
-        "max_charging_current"->"maxChargingCurrent" to value                                   // Unknown Zebra max_charging_current: The maximum charging current of the battery
         "battery_error_status"->"batteryErrorStatus" to value                                   // Unknown Zebra battery_error_status: The error status of the battery
-        "battery_low"->"batteryLow" to value                                                    // Unknown Zebra battery_low: Indicates if the battery is low
         "battery_type"->"batteryType" to value                                                  // Unknown Zebra battery_type: The type of the battery
-        "icon-small"->"iconSmall" to value                                                      // Unknown Zebra icon-small: The icon representing the battery status
-        "max_charging_voltage"->"maxChargingVoltage" to value                                   // Unknown Zebra max_charging_voltage: The maximum charging voltage of the battery
         "zcm_enabled"->"zcmEnabled" to value                                                    // Unknown Zebra zcm_enabled: Indicates if the Zebra Charging Management (ZCM) is enabled
         "zcm_mode"->"zcmMode" to value                                                          // Unknown Zebra zcm_mode: The mode of the Zebra Charging Management (ZCM)
         "zcm_extra"->"zcmExtra" to value                                                        // Unknown Zebra zcm_extra: Additional information about the Zebra Charging Management (ZCM)
+        "screenactiveduration"->"screenActiveDuration" to value                                 // Unknown Zebra screenactiveduration TC56,-TC26 ([Power+] Time since the screen was last active(mins).)
         "battery_usage_numb"->"batteryUsageNumber" to value                                     // [Power] No of charge cycles.
         "battery_usage_decommission_threshold"->"batteryUsageDecommissionThreshold" to value    // When the "batteryUsageNumber" is greater than or equal to the "batteryUsageDecommissionThreshold", the battery is past its useful life and should be replaced.
         "ratedcapacity"->"ratedCapacity" to value                                               // [Power,Power+] Rated Capacity of the Battery(mAh).
@@ -87,7 +76,25 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
         "time_to_empty"->"timeToEmpty" to value                                                 // [Power+] Remaining time until the device becomes unusable under current discharge conditions. If the returned value is 65535, then time_to_empty is considered to be unknown(mins).
         "time_to_full"->"timeToFull" to value                                                   // [Power+] Time until battery is fully charged under present charging conditions. If the returned value is 65535, then time_to_full is considered to be unknown(mins).
         "present_charge"->"presentCharge" to value                                              // [Power+] Amount of usable charge remaining in the battery under current discharge conditions(mAh).
-        "bk_voltage"->"bkVoltage" to value                                                      // [Backup Battery] Backup battery voltage(mV).
+        "bkvoltage"->"backupBatteryVoltage" to value                                            // [Backup Battery] Backup battery voltage(mV).
+        "minbatterytemp"->"minBatteryTemp" to (value as Int / 10).toDouble()                    // [Power,Power+] Minimum battery temperature during the last charge/discharge cycle(°C).
+        "maxbatterytemp"->"maxBatteryTemp" to (value as Int / 10).toDouble()                    // [Power,Power+] Maximum battery temperature during the last charge/discharge cycle(°C).
+        "battery_percent_decommission_threshold"->"batteryPercentDecommissionThreshold" to value // [Power+] Battery percent decommission threshold. When the "battery_usage_numb" is greater than or equal to the "battery_percent_decommission_threshold", the battery is past its useful life and should be replaced.
+        "chargingduration"->"chargingDuration" to value                                         // [Power+] Total time spent charging the battery during the last charge/discharge cycle(mins).
+        "timesincelastcharge"->"timeSinceLastCharge" to value                                   // [Power+] Time since the battery was last charged(mins).
+        "lastchargelength"->"lastChargeLength" to value                                         // [Power+] Length of the last charge(mins).
+        "timeremaining"->"timeRemaining" to value                                               // [Power+] Remaining time until the device is powered off under current discharge conditions(mins).
+        "rebootcount"->"rebootCount" to value                                                   // [Power+] Number of times the device has been rebooted.
+        "deviceoffduration"->"deviceOffDuration" to value                                       // [Power+] Total time the device has been powered off during the last charge/discharge cycle(mins).
+        "deviceonduration"->"deviceOnDuration" to value                                         // [Power+] Total time the device has been powered on during the last charge/discharge cycle(mins).
+        "timesincelastfullcharge"->"timeSinceLastFullCharge" to value                           // [Power+] Time since the battery was last fully charged(mins).
+        "backup_power_type"->"backupPowerType" to value                                         // 
+        "usb_liquid_status"->"usbLiquidStatus" to value                                         // Boolean value indicating if the USB port is in a liquid state. Possible values: true=USB port is in a liquid state, false=USB port is not in a liquid state.
+
+        /*  ?? What is this
+        extraMap: {screenactiveduration: 580, battery_percent_decommission_threshold: 80, maxbatterytemp: 600, minbatterytemp: -140, chargingduration: 2091, timesincelastcharge: 2091, lastchargelength: 0,
+        timeremaining: 506, rebootcount: 29, bkvoltage: 0, deviceoffduration: 0, deviceonduration: 20
+         */
         else->null
       }
     }
