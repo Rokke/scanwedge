@@ -40,3 +40,14 @@
 
 ## 1.0.4
 * Bugfix when creating a default profile on Honeywell device
+
+## 1.1.0
+* Extended battery info: Added support for more battery properties and device types (Zebra, Honeywell, Samsung, etc.)
+* Improved battery status mapping and parsing for multiple manufacturers
+* Added new fields to ExtendedBatteryStatus (e.g., batteryLow, backupBatteryVoltage, healthPercentage, timeToEmpty, timeToFull, etc.)
+* Refactored battery monitoring and status reporting for Android 14 and newer
+* Improved platform checks and error handling in ScanwedgeChannel
+* Fixed GS1DataMatrix not supported issue (#7)
+* Added stopMonitoringBatteryStatus function
+* Various bugfixes and code cleanups
+* Fixed Fixes Rokke/scanwedge#9

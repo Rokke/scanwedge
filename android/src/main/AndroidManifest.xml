@@ -2,7 +2,7 @@
   package="no.talgoe.scanwedge.scanwedge">
   <uses-permission android:name="com.honeywell.decode.permission.DECODE" />
   <application>
-    <receiver
+    <!--receiver
       android:name="${applicationName}"
       android:enabled="true"
       android:exported="false">
@@ -10,8 +10,7 @@
             <action android:name="com.symbol.datawedge.api.ACTION" />
             <action android:name="com.honeywell.aidc.action.ACTION_CLAIM_SCANNER" />
             <action android:name="no.mobcon.scanwedge.SCAN" />
-            <!-- <action android:name="no.talgoe.scanwedge.scanwedge.SCAN" /> -->
         </intent-filter>
-    </receiver>
+    </receiver-->
   </application>
 </manifest>
