@@ -59,3 +59,6 @@
 
 ## 1.1.2
 * Added support for Urovo devices thanks to @pedromellofh
+
+## 1.1.3
+* Implemented disposal of the hardwarePlugin on initialization to prevent the multiplication return of the scan result with doing hot restarts of the app. Thanks to @FUAUAB
