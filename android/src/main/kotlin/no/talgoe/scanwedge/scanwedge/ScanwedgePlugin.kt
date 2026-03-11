@@ -124,6 +124,8 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
         result.error("INVALID_INPUTPARAMETERS", "Must provide a config", "Invalid config")
       }
     }else if(call.method=="initializeDataWedge"){
+      hardwarePlugin?.dispose(context)
+      hardwarePlugin = null
       // Checking if the device is a Zebra device. Checking that Build.MANUFACTURER or Build.MODEL starts with 'ZEBRA' using uppercase letters.
       log?.i(TAG, "isSupported-manufacturer: ${android.os.Build.MANUFACTURER}, model: ${android.os.Build.MODEL}")
       val manufacturer = android.os.Build.MANUFACTURER?.uppercase()?.split(" ")?.get(0)
