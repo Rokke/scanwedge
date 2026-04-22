@@ -112,9 +112,9 @@ class DatalogicPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
         }
         if(!keepDefaults){
             for(barcode in datalogicDefaultTypes){
-            log?.d("BarcodePlugin", "removing barcode: $barcode")
-            barcode.datalogicDisableBarcode(properties)
-        }
+                log?.d("BarcodePlugin", "removing barcode: $barcode")
+                barcode.datalogicDisableBarcode(properties)
+            }
         }else{
             log?.d(TAG, "keeping default barcodes")
         }

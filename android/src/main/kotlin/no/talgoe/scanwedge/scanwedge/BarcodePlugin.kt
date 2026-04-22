@@ -61,7 +61,8 @@ class BarcodePlugin(val type: BarcodeTypes, private val minLength: Int?, private
             lst.add("${decoderName}_ENABLE=true")
             if(minLength==0 && maxLength==0){
                 lst.add("${decoderName}_LENGTH_CONTROL=0")
-            }else{
+            }else if(minLength!=null || maxLength!=null){
+                lst.add("${decoderName}_LENGTH_CONTROL=${if (maxLength == null) 1 else 3}")     // LENGTH_CONTROL DataLogic: 0=None, 1=Only accept length of minLength, 2=only minLength and the maxLength, 3=Range
                 if(minLength != null) {
                     lst.add("${decoderName}_LENGTH1=$minLength")
                 }
