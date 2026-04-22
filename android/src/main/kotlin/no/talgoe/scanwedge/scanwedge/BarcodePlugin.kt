@@ -59,11 +59,15 @@ class BarcodePlugin(val type: BarcodeTypes, private val minLength: Int?, private
         if(decoderName != null) {
             log?.d("BarcodePlugin", "datalogicAddToList enable: $type, $decoderName")
             lst.add("${decoderName}_ENABLE=true")
-            if(minLength != null) {
-                lst.add("${decoderName}_LENGTH1=$minLength")
-            }
-            if(maxLength != null) {
-                lst.add("${decoderName}_LENGTH2=$maxLength")
+            if(minLength==0 && maxLength==0){
+                lst.add("${decoderName}_LENGTH_CONTROL=0")
+            }else{
+                if(minLength != null) {
+                    lst.add("${decoderName}_LENGTH1=$minLength")
+                }
+                if(maxLength != null) {
+                    lst.add("${decoderName}_LENGTH2=$maxLength")
+                }
             }
         }else{
             log?.e("BarcodePlugin", "datalogicAddToList: Invalid barcode type: $type")

@@ -5,6 +5,12 @@ import 'package:scanwedge/models/barcodetype_enum.dart';
 /// This generic class has the settings for the basic scanprofile
 /// This can be extended with the hardware specific profiles like [HoneywellProfileModel] or [ZebraProfileModel]
 /// It's no problem sending a hardware specific profile to a different hardware, the settings that are not supported will be ignored
+/// NB! For DataLogic devices the length min/max is inherited from previous setup so if this is not set for the codetype used it will use
+///     the previously set length if any. You can set min/max length to 0 and it will set no length check for that specific codetype
+///     But only use this for the allowed codetypes (not tested that all these works):
+///       1D: Code 128, Code 39, I2of5, Codabar, Matrix 2 of 5, MSI, and Discrete 2 of 5
+///       2D: Data Matrix, QR Code, Aztec Code, PDF417, Micro PDF417
+
 class ProfileModel {
   String profileName;
   bool keepDefaults;
@@ -39,10 +45,10 @@ class HoneywellProfileModel extends ProfileModel {
 
   @override
   Map<String, dynamic> get customMap => {
-    'honeywell': {
-        'enableEanCheckDigitTransmission': enableEanCheckDigitTransmission,
-    },
-  };
+        'honeywell': {
+          'enableEanCheckDigitTransmission': enableEanCheckDigitTransmission,
+        },
+      };
 }
 
 /// ZebraProfileModel class

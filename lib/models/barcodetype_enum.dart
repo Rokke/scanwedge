@@ -29,6 +29,9 @@ class BarcodeConfig {
 
   /// The minimum and maximum length of the barcode. If omitted, the barcode can be of any length
   /// Note that this is not supported on all barcode types so you should check the hardware vendors documentation for the specific barcode type (or test).
+  /// The normal codes that support lengths (DataLogic, Honeywell, Zebra) is
+  ///   1D: Code 128, Code 39, I2of5, Codabar, Matrix 2 of 5, MSI, and Discrete 2 of 5
+  ///   2D: Data Matrix, QR Code, Aztec Code, PDF417, Micro PDF417
   final int? minLength, maxLength;
 
   BarcodeConfig({required this.barcodeType, this.minLength, this.maxLength});
