@@ -23,7 +23,15 @@ allprojects {
 
 plugins {
     id("com.android.library")
-    id("kotlin-android")
+}
+
+// Built-in Kotlin migration: AGP 9.0+ removed support for applying the Kotlin
+// Gradle Plugin (KGP). Apply KGP only on older AGP so that builds keep working
+// on both AGP < 9 (legacy) and AGP 9+ (built-in Kotlin).
+// See https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-plugin-authors
+val agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.substringBefore('.').toInt()
+if (agpMajor < 9) {
+    apply(plugin = "org.jetbrains.kotlin.android")
 }
 
 android {
@@ -34,10 +42,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     sourceSets {
@@ -67,6 +71,14 @@ android {
                 }
             }
         }
+    }
+}
+
+// Configure the Kotlin compiler via the Kotlin project extension so it works
+// whether KGP is applied (AGP < 9) or provided built-in by AGP 9+.
+project.extensions.configure(org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension::class.java) {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
 

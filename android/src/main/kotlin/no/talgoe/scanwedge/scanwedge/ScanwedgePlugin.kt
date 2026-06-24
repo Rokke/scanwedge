@@ -77,10 +77,23 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
     return hardwarePlugin?.apiVersion ?: android.os.Build.MANUFACTURER?.uppercase()?.split(" ")?.get(0)
   }
 
+  /** Device info as a keyed map so the Flutter side can read named fields instead of
+   *  splitting a pipe-delimited string by index. New fields can be added without
+   *  breaking existing consumers. */
+  private fun deviceInfoMap(): HashMap<String, Any?> = hashMapOf(
+    "apiVersion" to hardwarePlugin?.apiVersion,
+    "manufacturer" to android.os.Build.MANUFACTURER,
+    "model" to android.os.Build.MODEL,
+    "product" to android.os.Build.PRODUCT,
+    "osVersion" to android.os.Build.VERSION.RELEASE,
+    "packageName" to context?.packageName,
+    "deviceName" to Settings.Global.getString(context?.contentResolver, Settings.Global.DEVICE_NAME),
+  )
+
   override fun onMethodCall(call: MethodCall, result: Result) {
     log?.d(TAG, "onMethodCall: ${call.method}, ${call.arguments}")
     if (call.method == "getDeviceInfo") {
-      result.success("${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}|${context?.packageName}|${Settings.Global.getString(context?.contentResolver, Settings.Global.DEVICE_NAME)}")
+      result.success(deviceInfoMap())
     }else if(call.method == "getBatteryStatus"){
       result.success(Utilities.getBatteryStatus(context!!))
     }else if(call.method == "getExtendedBatteryStatus"){
@@ -145,7 +158,7 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
       }
       hardwarePlugin?.initialize(context)
       log?.i(TAG, "initializeDataWedge: ${hardwarePlugin?.javaClass?.name}")
-      result.success("${hardwarePlugin?.apiVersion}|${android.os.Build.MANUFACTURER}|${android.os.Build.MODEL}|${android.os.Build.PRODUCT}|${android.os.Build.VERSION.RELEASE}|${context?.packageName}|${Settings.Global.getString(context?.contentResolver, Settings.Global.DEVICE_NAME)}")
+      result.success(deviceInfoMap())
     }else if(call.method=="sendCommand"){
       if(hardwarePlugin is ZebraPlugin){
         val command=call.argument<String>("command")

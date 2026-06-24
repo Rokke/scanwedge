@@ -34,21 +34,18 @@ class ScanwedgeChannel {
   static Future<ScanwedgeChannel> initialize() async {
     try {
       if (isAndroid) {
-        final supportedResponse = await _methodChannel.invokeMethod<String>('initializeDataWedge');
-        debugPrint('initializeDataWedge: $supportedResponse');
-        if (supportedResponse != null) {
-          final devInfoString = supportedResponse.split('|');
-          if (devInfoString.length > 5) {
-            return ScanwedgeChannel._(
-              supportedDevice: _fetchSupportedDevice(devInfoString[0]),
-              manufacturer: devInfoString[1],
-              modelName: devInfoString[2],
-              productName: devInfoString[3],
-              osVersion: devInfoString[4],
-              packageName: devInfoString[5],
-              deviceName: devInfoString[6],
-            );
-          }
+        final deviceInfo = await _methodChannel.invokeMapMethod<String, dynamic>('initializeDataWedge');
+        debugPrint('initializeDataWedge: $deviceInfo');
+        if (deviceInfo != null) {
+          return ScanwedgeChannel._(
+            supportedDevice: _fetchSupportedDevice(deviceInfo['apiVersion']?.toString() ?? ''),
+            manufacturer: deviceInfo['manufacturer']?.toString() ?? '',
+            modelName: deviceInfo['model']?.toString() ?? '',
+            productName: deviceInfo['product']?.toString() ?? '',
+            osVersion: deviceInfo['osVersion']?.toString() ?? '',
+            packageName: deviceInfo['packageName']?.toString() ?? '',
+            deviceName: deviceInfo['deviceName']?.toString() ?? '',
+          );
         }
       }
     } catch (e) {
