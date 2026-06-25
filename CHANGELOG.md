@@ -79,3 +79,4 @@
 * `sendCommandBundle` no longer hangs forever if the native result never arrives (15s timeout) and is guarded against duplicate completion
 * Stopping the native battery monitor on stream cancellation and disposing a previous monitor on re-subscribe, preventing a leaked/duplicated receiver
 * Fixed `intentLog` being dropped on deserialization when `extraMap` was null
+* Fixed Honeywell GS1 DataBar mapping to the wrong decoder (`DEC_EAN128`, which collided with EAN128); GS1 DataBar now maps to `DEC_RSS_14` and GS1 DataBar Expanded to `DEC_RSS_EXPANDED` (previously unsupported on Honeywell) (#18)

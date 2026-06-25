@@ -292,8 +292,12 @@ enum class BarcodeTypes(val code: String) {
             DATAMATRIX -> "DEC_DATAMATRIX"
             EAN8 -> "DEC_EAN8"
             EAN13 -> "DEC_EAN13"
-            EAN128 -> "DEC_EAN128"
-            GS1_DATABAR -> "DEC_EAN128"
+            EAN128 -> "DEC_EAN128"                  // GS1-128 (formerly EAN-128 / UCC-128)
+            // GS1 DataBar is the DEC_RSS_* family on Honeywell, NOT DEC_EAN128 (that was a
+            // collision with EAN128). Verify the exact constants on a device (see issue #18):
+            // DEC_RSS_14 = GS1 DataBar Omnidirectional/RSS-14, DEC_RSS_EXPANDED = GS1 DataBar Expanded.
+            GS1_DATABAR -> "DEC_RSS_14"
+            GS1_DATABAR_EXPANDED -> "DEC_RSS_EXPANDED"
             I2OF5 -> "DEC_I25"
             MAXICODE -> "DEC_MAXICODE"
             PDF417 -> "DEC_PDF417"
