@@ -1,6 +1,5 @@
 package no.talgoe.scanwedge.scanwedge
 
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -37,7 +36,6 @@ class UrovoPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
 
     override val apiVersion: String get() = "UROVO"
 
-    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun initialize(context: Context?): Boolean {
         log?.i(TAG, "$TAG initializing")
         if (context == null)

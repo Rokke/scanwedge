@@ -29,7 +29,8 @@ fun Context.registerReceiverCompat(receiver: BroadcastReceiver, filter: IntentFi
 /**
  * Unregisters [receiver], ignoring the [IllegalArgumentException] Android throws when the
  * receiver was never registered (e.g. registration failed inside initialize() and returned
- * false). Mirrors the guard BatteryMonitor already uses, so dispose()/re-init can't crash.
+ * false), so dispose()/re-init can't crash. (BatteryMonitor achieves the same safety with
+ * an isReceiverRegistered flag; the hardware plugins share no such state, so they catch.)
  */
 fun Context.unregisterReceiverSafely(receiver: BroadcastReceiver) {
     try {
