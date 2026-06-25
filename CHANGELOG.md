@@ -63,12 +63,12 @@
 ## 1.1.3
 * Implemented disposal of the hardwarePlugin on initialization to prevent the multiplication return of the scan result with doing hot restarts of the app. Thanks to @FUAUAB
 
-## 1.1.4-beta.1
+## 1.1.4
 * Migrated to built-in Kotlin so the plugin builds on Android Gradle Plugin (AGP) 9.0+, while still applying the Kotlin Gradle Plugin on AGP < 9 for backwards compatibility (#16)
 * Device info is now passed across the platform channel as a keyed map instead of a pipe-delimited string, removing index-drift fragility and making it easy to add fields later (#17)
 * Bumped the example app's Gradle wrapper to 8.13 (required by the bundled AGP)
 
-## 1.1.4-beta.2
+## 1.1.5-beta.1
 * Fixed battery voltage and temperature being truncated by integer division (e.g. 4339 mV reported as 4.0 V)
 * Guarded `batteryPercentage` against a zero/negative `scale` (was crashing with Infinity→toInt, or returning a negative percentage)
 * Guarded `batteryDecommissionPercentageLeft` against a divide-by-zero when the decommission threshold is 100
