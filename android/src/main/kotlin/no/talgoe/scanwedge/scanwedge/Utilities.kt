@@ -29,8 +29,8 @@ class Utilities {
                             "android.os.extra.CHARGING_STATUS" -> batteryStatus["chargingStatus"] = value       // [API 34] Int value representing the battery charging status
                             "status" -> batteryStatus["status"] = value                                         // [API 5] 1: Unknown, 2: Charging, 3: Discharging, 4: Not charging, 5: Full
                             "health" -> batteryStatus["health"] = value                                         // [API 5] 1: Unknown, 2: Good, 3: Overheat, 4: Dead, 5: Over voltage, 6: Unspecified failure, 7: Cold
-                            "temperature" -> batteryStatus["temperature"] = (value as Int / 10).toDouble()      // [API 5] integer containing the current battery temperature in tenths of a degree Celsius.
-                            "voltage" -> batteryStatus["voltage"] = (value as Int / 1000).toDouble()            // [API 5] integer containing the current battery voltage in millivolts.
+                            "temperature" -> batteryStatus["temperature"] = (value as Int).toDouble() / 10      // [API 5] integer containing the current battery temperature in tenths of a degree Celsius.
+                            "voltage" -> batteryStatus["voltage"] = (value as Int).toDouble() / 1000            // [API 5] integer containing the current battery voltage in millivolts.
                             "level" -> batteryStatus["level"] = value                                           // [API 5] integer between 0 and "scale" representing the current battery level.
                             "scale" -> batteryStatus["scale"] = value                                           // [API 5] integer containing the maximum battery level.
                             "plugged" -> batteryStatus["plugged"] = value                                       // [API 5] 0: Unplugged, 1: AC, 2: USB, 4: Wireless

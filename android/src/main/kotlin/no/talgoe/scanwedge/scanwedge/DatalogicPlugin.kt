@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -58,10 +57,7 @@ class DatalogicPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
             try{
                 val filter = IntentFilter(ScanwedgePlugin.SCANWEDGE_ACTION)
                 filter.addCategory("SCAN")
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                    context.registerReceiver(barcodeDataReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
-                else
-                    context.registerReceiver(barcodeDataReceiver, filter)
+                context.registerReceiverCompat(barcodeDataReceiver, filter, exported = false)
 
                 scanW.sendBroadcast(Intent(ACTION_CONFIGURATION_COMMIT).apply{
                     putExtra(EXTRA_CONFIGURATION_CHANGED_MAP, "WEDGE_KEYBOARD_ENABLE=false,WEDGE_INTENT_ACTION_NAME=${ScanwedgePlugin.SCANWEDGE_ACTION},WEDGE_INTENT_CATEGORY_NAME=SCAN,WEDGE_INTENT_EXTRA_BARCODE_STRING=$ACTION_BARCODE_STRING,WEDGE_INTENT_EXTRA_BARCODE_DATA=$ACTION_EXTRABARCODE_STRING,WEDGE_INTENT_EXTRA_BARCODE_TYPE=$ACTION_BARCODE_TYPE,WEDGE_INTENT_ENABLE=true")
@@ -75,7 +71,7 @@ class DatalogicPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
     }
 
     override fun dispose(context: Context?) {
-        context?.unregisterReceiver(barcodeDataReceiver)
+        context?.unregisterReceiverSafely(barcodeDataReceiver)
     }
 
     override fun toggleScanning():Boolean {

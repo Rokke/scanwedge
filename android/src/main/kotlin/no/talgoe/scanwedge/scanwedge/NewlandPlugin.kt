@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 
 // Hardware plugin for Newland devices that extends the IHardwarePlugin interface.
 class NewlandPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) : IHardwarePlugin {
@@ -48,12 +47,13 @@ class NewlandPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?
 
         val filter = IntentFilter(ScanwedgePlugin.SCANWEDGE_ACTION)
         filter.addAction(NL_SCAN_ACTION)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            context.registerReceiver(barcodeDataReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
-        else
-            context.registerReceiver(barcodeDataReceiver, filter)
-
-        return true
+        return try {
+            context.registerReceiverCompat(barcodeDataReceiver, filter, exported = false)
+            true
+        } catch (e: Exception) {
+            log?.e(TAG, "$TAG initialize, Exception: ${e.message}")
+            false
+        }
     }
 
     override fun createProfile(
@@ -81,6 +81,6 @@ class NewlandPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?
     }
 
     override fun dispose(context: Context?) {
-        context?.unregisterReceiver(barcodeDataReceiver)
+        context?.unregisterReceiverSafely(barcodeDataReceiver)
     }
 }

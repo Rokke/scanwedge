@@ -42,7 +42,7 @@ class BarcodeConfig {
       };
   factory BarcodeConfig.fromMap(Map<String, dynamic> map) {
     return BarcodeConfig(
-      barcodeType: BarcodeTypes.values.firstWhere((e) => e.name == map['type']),
+      barcodeType: BarcodeTypes.values.firstWhere((e) => e.name == map['type'], orElse: () => BarcodeTypes.unknown),
       minLength: map['minLength'],
       maxLength: map['maxLength'],
     );
