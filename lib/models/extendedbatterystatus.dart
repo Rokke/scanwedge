@@ -136,7 +136,7 @@ class ExtendedBatteryStatus {
   bool get isHoneywell => deviceManufacturer == 'HONEYWELL';
   int? get calculatedBatteryUsage => batteryUsageNumber ?? ((totalCumulativeCharge == null || (ratedCapacity ?? 0) == 0) ? null : totalCumulativeCharge! ~/ ratedCapacity!);
   int? get batteryDecommissionPercentageLeft {
-    if (healthPercentage != null && batteryPercentDecommissionThreshold != null) {
+    if (healthPercentage != null && batteryPercentDecommissionThreshold != null && batteryPercentDecommissionThreshold! != 100) {
       return (((healthPercentage! - batteryPercentDecommissionThreshold!) / (100 - batteryPercentDecommissionThreshold!)) * 100).toInt();
     }
     final calculated = calculatedBatteryUsage;
@@ -147,7 +147,7 @@ class ExtendedBatteryStatus {
   static int? tryToCalculateBatteryDecommissionThreshold(Map<String, dynamic> json) =>
       switch (json['deviceManufacturer']) { 'ZEBRA' => switch (json['batteryType']) {  200 || 201 || 206 => 400, _ => null}, _ => null };
 
-  int get batteryPercentage => ((level / scale) * 100).toInt();
+  int get batteryPercentage => scale <= 0 ? -1 : ((level / scale) * 100).toInt();
 
   BatteryPluggedStatus get pluggedStatus => BatteryPluggedStatus.fromInt(plugged);
   factory ExtendedBatteryStatus.fromJson(Map<String, dynamic> json) {
@@ -235,7 +235,7 @@ class ExtendedBatteryStatus {
         batterySwapping: json['batterySwapping'],
 
         extraMap: json['extraMap'] == null ? null : Map<String, dynamic>.from(json['extraMap']),
-        intentLog: json['extraMap'] == null ? null : json['intentLog'],
+        intentLog: json['intentLog'],
       );
     } catch (e, s) {
       log('ExtendedBatteryStatus.fromJson, $json', error: e, stackTrace: s);

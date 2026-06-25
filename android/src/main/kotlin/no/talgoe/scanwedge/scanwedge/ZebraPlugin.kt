@@ -103,15 +103,15 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
           val filter = IntentFilter()
           filter.addCategory(Intent.CATEGORY_DEFAULT)
           filter.addAction(ScanwedgePlugin.SCANWEDGE_ACTION)
-          context.registerReceiver(barcodeDataReceiver, filter, Context.RECEIVER_EXPORTED)
+          context.registerReceiverCompat(barcodeDataReceiver, filter, exported = true)
           val filter2=IntentFilter()
           filter2.addCategory("android.intent.category.DEFAULT")
           filter2.addAction(RESULT_ACTION)
-          context.registerReceiver(barcodeDataReceiver, filter2, Context.RECEIVER_EXPORTED)
+          context.registerReceiverCompat(barcodeDataReceiver, filter2, exported = true)
           val filterNotification=IntentFilter()
           filterNotification.addCategory(Intent.CATEGORY_DEFAULT)
           filterNotification.addAction(NOTIFICATION_ACTION)
-          context.registerReceiver(barcodeDataReceiver, filterNotification, Context.RECEIVER_EXPORTED)
+          context.registerReceiverCompat(barcodeDataReceiver, filterNotification, exported = true)
           return true
         } catch (e: Exception) {
           log?.e(TAG, "Error in ZebraPlugin: ${e.message}")
@@ -120,7 +120,7 @@ class ZebraPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) 
       return false
     }
     override fun dispose(context: Context?) {
-      context?.unregisterReceiver(barcodeDataReceiver)
+      context?.unregisterReceiverSafely(barcodeDataReceiver)
     }
     override fun toggleScanning():Boolean {
       log?.i(TAG, "toggleScanning")

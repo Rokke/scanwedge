@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.os.Build
 
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -64,10 +63,7 @@ class HoneywellPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
             try{
                 val filter = IntentFilter(ScanwedgePlugin.SCANWEDGE_ACTION)
                 filter.addCategory("SCAN")
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                    context.registerReceiver(barcodeDataReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
-                else
-                    context.registerReceiver(barcodeDataReceiver, filter)
+                context.registerReceiverCompat(barcodeDataReceiver, filter, exported = false)
 
                 scanW.sendBroadcast(Intent(ACTION_RELEASE_SCANNER).apply{ setPackage("com.intermec.datacollectionservice") })
                 return true
@@ -80,7 +76,7 @@ class HoneywellPlugin(private val scanW: ScanwedgePlugin, private val log: Logge
 
     override fun dispose(context: Context?) {
         scanW.sendBroadcast(Intent(ACTION_RELEASE_SCANNER).setPackage("com.intermec.datacollectionservice"))
-        context?.unregisterReceiver(barcodeDataReceiver)
+        context?.unregisterReceiverSafely(barcodeDataReceiver)
     }
 
     override fun toggleScanning():Boolean {

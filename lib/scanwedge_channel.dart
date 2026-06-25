@@ -75,18 +75,18 @@ class ScanwedgeChannel {
         case "result":
           debugPrint("result method ${call.arguments}");
           if (call.arguments["modules"] is List) {
+            var outcome = "OK";
             for (final element in call.arguments["modules"]) {
               if (element["result"] != "SUCCESS") {
-                completerSendCommandBundle?.complete(element["module"]);
-                return;
+                outcome = element["module"]?.toString() ?? "FAILED";
+                break;
               }
             }
-            completerSendCommandBundle?.complete("OK");
+            _completeCommandBundle(outcome);
           } else {
             debugPrint("result method not list: ${call.arguments["modules"]}");
-            completerSendCommandBundle?.complete(call.arguments);
+            _completeCommandBundle(call.arguments?.toString() ?? "OK");
           }
-          log('result: ${completerSendCommandBundle?.future}');
           break;
         case "batteryStatus":
           // debugPrint("batteryStatus method ${call.arguments}");
@@ -151,6 +151,9 @@ class ScanwedgeChannel {
     _streamBatteryController = StreamController<ExtendedBatteryStatus>.broadcast();
     _streamBatteryController!.onCancel = () {
       log('monitorBatteryStatus: onCancel');
+      // Tell native to stop too, otherwise its BroadcastReceiver stays registered
+      // and a later monitorBatteryStatus() would leak/duplicate it.
+      _methodChannel.invokeMethod('stopMonitoringBatteryStatus');
       _streamBatteryController?.close();
       _streamBatteryController = null;
     };
@@ -163,14 +166,33 @@ class ScanwedgeChannel {
   Future<bool> sendCommand({required String command, required String parameter}) async =>
       isDeviceSupported ? await _methodChannel.invokeMethod<bool>('sendCommand', {'command': command, 'parameter': parameter}) ?? false : false;
 
+  // Completes the pending sendCommandBundle future at most once. Guards against a
+  // duplicate/late 'result' callback throwing 'Already completed'. The field itself
+  // is cleared by sendCommandBundle (or overwritten by the next call), not here, so
+  // the awaiter always holds a valid completer reference.
+  void _completeCommandBundle(String value) {
+    final completer = completerSendCommandBundle;
+    if (completer != null && !completer.isCompleted) completer.complete(value);
+  }
+
   @Deprecated('This is for backwards compatibility and only support Zebra devices, this will be removed later')
   Future<bool> sendCommandBundle({required String command, required Map<String, dynamic> parameter, required bool sendResult}) async {
     if (!isDeviceSupported) return false;
     debugPrint('sendCommandBundle-$isDeviceSupported');
-    if (sendResult) completerSendCommandBundle = Completer();
+    final completer = sendResult ? (completerSendCommandBundle = Completer()) : null;
     final invoked = await _methodChannel.invokeMethod<bool>('sendCommandBundle', {'command': command, 'parameter': parameter, 'sendResult': sendResult});
-    if (invoked == true && sendResult) {
-      _lastCompleterError = await completerSendCommandBundle!.future;
+    if (invoked == true && completer != null) {
+      // Guard against the native 'result' callback never arriving (e.g. command
+      // rejected after the ack), which would otherwise hang this future forever.
+      _lastCompleterError = await completer.future.timeout(
+        const Duration(seconds: 15),
+        onTimeout: () {
+          log('sendCommandBundle: timed out waiting for result');
+          return 'TIMEOUT';
+        },
+      );
+      // Only clear if a newer call hasn't already replaced it.
+      if (identical(completerSendCommandBundle, completer)) completerSendCommandBundle = null;
       log('sendCommandBundle: $_lastCompleterError');
       return _lastCompleterError == 'OK';
     }

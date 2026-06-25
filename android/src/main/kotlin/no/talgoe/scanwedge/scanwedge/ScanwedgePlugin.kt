@@ -101,6 +101,7 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
       log?.i(TAG, "getExtendedBatteryStatus: $batteryStatus")
       result.success(batteryStatus)
     }else if(call.method == "monitorBatteryStatus"){
+      batteryPlugin?.dispose(context)   // avoid leaking a previous monitor's registered receiver on re-monitor
       batteryPlugin = BatteryMonitor(this, log)
       batteryPlugin!!.monitorBatteryStatus(context!!)
       log?.i(TAG, "monitorBatteryStatus: $batteryPlugin")
@@ -117,24 +118,23 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
     }else if(call.method == "disableScanner"){
       result.success(hardwarePlugin?.disableScanner())
     }else if(call.method == "createProfile"){
-      val argument=call.arguments
-      val config = argument as HashMap<String, Any>?
-      if(config!=null){
+      val config = call.arguments as? HashMap<*, *>
+      val name = config?.get("name") as? String
+      if(config!=null && name!=null){
         val barcodeList=ArrayList<BarcodePlugin>()
-        if(config["barcodes"] is List<*>){
-          val barcodes=config["barcodes"] as List<HashMap<String, Any>>
-          log?.i(TAG, "createProfile: barcodes: $barcodes")
-          // convert the list of barcodes to a list of BarcodePlugin
-          for(barcode in barcodes){
-            val barcodePlugin=BarcodePlugin.createBarcodePlugin(barcode, log)
+        (config["barcodes"] as? List<*>)?.forEach { barcode ->
+          if(barcode is HashMap<*, *>){
+            @Suppress("UNCHECKED_CAST")
+            val barcodePlugin=BarcodePlugin.createBarcodePlugin(barcode as HashMap<String, Any>, log)
             if(barcodePlugin!=null) barcodeList.add(barcodePlugin)
           }
         }
-        hardwarePlugin?.createProfile(config["name"] as String, barcodeList, config["hwConfig"] as? HashMap<String, Any>, config["keepDefaults"] as Boolean? ?: true)
+        @Suppress("UNCHECKED_CAST")
+        hardwarePlugin?.createProfile(name, barcodeList, config["hwConfig"] as? HashMap<String, Any>, config["keepDefaults"] as? Boolean ?: true)
         result.success(true)
       }else{
         log?.e(TAG, "createProfile: Invalid config")
-        result.error("INVALID_INPUTPARAMETERS", "Must provide a config", "Invalid config")
+        result.error("INVALID_INPUTPARAMETERS", "Must provide a config with a name", "Invalid config")
       }
     }else if(call.method=="initializeDataWedge"){
       hardwarePlugin?.dispose(context)
@@ -163,8 +163,11 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
       if(hardwarePlugin is ZebraPlugin){
         val command=call.argument<String>("command")
         val parameter=call.argument<String>("parameter")
-        val zebraPlugin=hardwarePlugin as ZebraPlugin
-        result.success(zebraPlugin.sendCommand(command!!, parameter!!))
+        if(command!=null && parameter!=null){
+          result.success((hardwarePlugin as ZebraPlugin).sendCommand(command, parameter))
+        }else{
+          result.error("INVALID_INPUTPARAMETERS", "Must provide command and parameter", "Invalid parameters")
+        }
       }else{
         log?.e(TAG, "sendCommand: hardwarePlugin is wrong type: ${hardwarePlugin?.javaClass?.name}")
         result.error("HARDWARE_NOT_SUPPORTED", "Hardware not supported", "Hardware not supported")
@@ -176,10 +179,10 @@ class ScanwedgePlugin(private var log: Logger?=null): FlutterPlugin, MethodCallH
         val parameter=call.argument<HashMap<String,Any>>("parameter")
         val shouldRetry=call.argument<Boolean>("sendResult")
         log?.i(TAG, "onMethodCall: sendCommandBundle($command, $parameter, $shouldRetry)")
-        if(parameter!=null){
-          result.success(zebraPlugin.sendCommandBundle(command!!, parameter, shouldRetry!!))
+        if(command!=null && parameter!=null && shouldRetry!=null){
+          result.success(zebraPlugin.sendCommandBundle(command, parameter, shouldRetry))
         }else{
-          result.error("INVALID_INPUTPARAMETERS", "Must provide a parameter", "Invalid parameter")
+          result.error("INVALID_INPUTPARAMETERS", "Must provide command, parameter and sendResult", "Invalid parameters")
         }
       }else{
         log?.e(TAG, "sendCommandBundle: hardwarePlugin is wrong type: ${hardwarePlugin?.javaClass?.name}")
