@@ -166,32 +166,33 @@ class ScanwedgeChannel {
   Future<bool> sendCommand({required String command, required String parameter}) async =>
       isDeviceSupported ? await _methodChannel.invokeMethod<bool>('sendCommand', {'command': command, 'parameter': parameter}) ?? false : false;
 
-  // Completes the pending sendCommandBundle future at most once, then clears it.
-  // Guards against a duplicate/late 'result' callback throwing 'Already completed'
-  // and against a stale completer lingering between calls.
+  // Completes the pending sendCommandBundle future at most once. Guards against a
+  // duplicate/late 'result' callback throwing 'Already completed'. The field itself
+  // is cleared by sendCommandBundle (or overwritten by the next call), not here, so
+  // the awaiter always holds a valid completer reference.
   void _completeCommandBundle(String value) {
     final completer = completerSendCommandBundle;
     if (completer != null && !completer.isCompleted) completer.complete(value);
-    completerSendCommandBundle = null;
   }
 
   @Deprecated('This is for backwards compatibility and only support Zebra devices, this will be removed later')
   Future<bool> sendCommandBundle({required String command, required Map<String, dynamic> parameter, required bool sendResult}) async {
     if (!isDeviceSupported) return false;
     debugPrint('sendCommandBundle-$isDeviceSupported');
-    if (sendResult) completerSendCommandBundle = Completer();
+    final completer = sendResult ? (completerSendCommandBundle = Completer()) : null;
     final invoked = await _methodChannel.invokeMethod<bool>('sendCommandBundle', {'command': command, 'parameter': parameter, 'sendResult': sendResult});
-    if (invoked == true && sendResult) {
+    if (invoked == true && completer != null) {
       // Guard against the native 'result' callback never arriving (e.g. command
       // rejected after the ack), which would otherwise hang this future forever.
-      _lastCompleterError = await completerSendCommandBundle!.future.timeout(
+      _lastCompleterError = await completer.future.timeout(
         const Duration(seconds: 15),
         onTimeout: () {
           log('sendCommandBundle: timed out waiting for result');
           return 'TIMEOUT';
         },
       );
-      completerSendCommandBundle = null;
+      // Only clear if a newer call hasn't already replaced it.
+      if (identical(completerSendCommandBundle, completer)) completerSendCommandBundle = null;
       log('sendCommandBundle: $_lastCompleterError');
       return _lastCompleterError == 'OK';
     }
