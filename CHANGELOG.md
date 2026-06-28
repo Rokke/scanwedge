@@ -68,7 +68,7 @@
 * Device info is now passed across the platform channel as a keyed map instead of a pipe-delimited string, removing index-drift fragility and making it easy to add fields later (#17)
 * Bumped the example app's Gradle wrapper to 8.13 (required by the bundled AGP)
 
-## 1.1.5-beta.1
+## 1.1.5
 * Fixed battery voltage and temperature being truncated by integer division (e.g. 4339 mV reported as 4.0 V)
 * Guarded `batteryPercentage` against a zero/negative `scale` (was crashing with Infinity→toInt, or returning a negative percentage)
 * Guarded `batteryDecommissionPercentageLeft` against a divide-by-zero when the decommission threshold is 100
