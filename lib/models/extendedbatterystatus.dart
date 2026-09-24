@@ -15,7 +15,9 @@ class ExtendedBatteryStatus {
   final int cycleCount, chargingStatus, plugged, chargeCounter, level, scale, seq, maxChargingVoltage, maxChargingCurrent, iconSmall, invalidCharger;
   final Map<String, dynamic>? extraMap;
   final String? intentLog;
-  final DateTime createdAt = DateTime.now();
+  /// When this reading was taken. Defaults to the moment the object is built, which is what a live
+  /// read wants; a caller reconstructing a stored or synthetic reading passes the real one.
+  final DateTime createdAt;
   // Zebra specific, null if not supported
   final int? batteryErrorStatus,
       batteryUsageDecommissionThreshold,
@@ -130,7 +132,8 @@ class ExtendedBatteryStatus {
     this.batterySwapping,
     this.extraMap,
     this.intentLog,
-  });
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
   BatteryDecommissionStatus? get batteryDecommissionStatus => batteryDecommission == null ? null : BatteryDecommissionStatus.fromInt(batteryDecommission!);
   bool get isZebra => deviceManufacturer.isEmpty || deviceManufacturer == 'ZEBRA';
   bool get isHoneywell => deviceManufacturer == 'HONEYWELL';
@@ -236,6 +239,10 @@ class ExtendedBatteryStatus {
 
         extraMap: json['extraMap'] == null ? null : Map<String, dynamic>.from(json['extraMap']),
         intentLog: json['intentLog'],
+        // Absent from a live intent - the platform never sends it - so a reading straight off the
+        // device still gets `DateTime.now()`. Present in anything [toJson] produced, which is what
+        // makes the pair round-trip.
+        createdAt: json['createdAt'] == null ? null : DateTime.tryParse(json['createdAt']),
       );
     } catch (e, s) {
       log('ExtendedBatteryStatus.fromJson, $json', error: e, stackTrace: s);

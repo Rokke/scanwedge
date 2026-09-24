@@ -86,3 +86,7 @@
 * A DataLogic profile that enables GS1-128 now also enables the Code 128 decoder that actually decodes it
 * The DataLogic property map is logged at info instead of debug — a rejected COMMIT gives no feedback, so this map is the only evidence of what the profile actually asked for
 * Added `BarcodePlugin.withType()` and a `toString()` that shows the symbology and its length range
+
+## 1.1.7
+* `ExtendedBatteryStatus.createdAt` can now be supplied to the constructor instead of always being `DateTime.now()`. A live reading is unaffected - omitting it still stamps the moment the object is built - but a caller reconstructing a stored or synthetic reading can now say when it was actually taken. Screens that print the reading time could otherwise never be tested or captured deterministically
+* `ExtendedBatteryStatus.fromJson` reads `createdAt` back, so it round-trips with `toJson`, which has always written it. A live intent never carries the field, so a reading straight off the device is unchanged
