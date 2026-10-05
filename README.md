@@ -60,6 +60,19 @@ The extra options are:
 ### HoneywellProfileModel
 This currently have no extra configuration options, so should use [ProfileModel] instead
 
+### NewlandProfileModel
+Extends [ProfileModel] with Newland's scanner settings. Other devices ignore them, and any you leave out stay as the device has them.
+The extra options are:
+[sendScanFailBroadcast] - Report failed trigger pulls. The plugin drops them either way
+[triggerMode] - When the scanner decodes, see [NewlandTriggerMode]
+[scanTimeout] - How long one decode attempt runs
+[rereadDelay] - How long the same barcode is ignored after a read
+[scanInterval] - The gap between attempts in continuous mode
+[soundOnScan], [vibrateOnScan], [ledOnScan] - Good-read feedback
+[mainTriggerKey], [leftTriggerKey], [rightTriggerKey], [pistolGripTrigger] - Which keys pull the trigger
+
+Newland has no per-app profiles, so these settings, and starting the plugin at all, change the scanner for the whole device and stay after your app exits. The class docs list what that means in practice.
+
 ### SupportedDevice
 This class is returned when calling [supportedDevice]
 ```dart
@@ -130,6 +143,7 @@ gs1DataBarExpanded,
 i2of5,
 mailmark,
 maxicode,
+microqr,
 pdf417,
 qrCode,
 upca,

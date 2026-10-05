@@ -10,7 +10,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 
-// Hardware plugin for Zebra devices that extends the IHardwarePlugin interface.
+// Hardware plugin for Honeywell devices that extends the IHardwarePlugin interface.
 class HoneywellPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) : IHardwarePlugin, IHardwareBatteryPlugin {
     // private val ACTION_BARCODE_DATA = "com.honeywell.sample.action.BARCODE_DATA"
     // private val SCANWEDGE_ACTION="no.talgoe.scanwedge.SCAN"

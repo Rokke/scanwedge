@@ -14,6 +14,7 @@ export 'package:scanwedge/models/aimtype.dart';
 export 'package:scanwedge/models/barcode_plugin.dart';
 export 'package:scanwedge/models/barcodetype_enum.dart';
 export 'package:scanwedge/models/extendedbatterystatus.dart';
+export 'package:scanwedge/models/newland_trigger_mode.dart';
 export 'package:scanwedge/models/plugin_names.dart';
 export 'package:scanwedge/models/profile_model.dart';
 export 'package:scanwedge/models/scanprofile.dart';

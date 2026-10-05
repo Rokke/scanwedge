@@ -9,7 +9,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 
-// Hardware plugin for Zebra devices that extends the IHardwarePlugin interface.
+// Hardware plugin for DataLogic devices that extends the IHardwarePlugin interface.
 class DatalogicPlugin(private val scanW: ScanwedgePlugin, private val log: Logger?) : IHardwarePlugin {
     // private val ACTION_BARCODE_DATA = "com.Datalogic.sample.action.BARCODE_DATA"
     // private val SCANWEDGE_ACTION="no.talgoe.scanwedge.SCAN"

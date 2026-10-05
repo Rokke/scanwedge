@@ -13,6 +13,7 @@ enum BarcodeTypes {
   i2of5,
   mailmark,
   maxicode,
+  microqr,
   pdf417,
   qrCode,
   upca,

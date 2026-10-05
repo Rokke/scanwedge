@@ -196,17 +196,27 @@ enum class BarcodeTypes(val code: String) {
                 // Linear
                 "CODE128" -> CODE128
                 "CODE39" -> CODE39
-                "UCCEAN128" -> EAN128
+                "CODE93" -> CODE93
+                "CODABAR" -> CODABAR
+                "UCCEAN128", "GS1_128" -> EAN128
+                "ITF", "ITF6", "ITF14" -> I2OF5
                 // EAN / UPC
                 "EAN8" -> EAN8
                 "EAN13" -> EAN13
                 "UPCA" -> UPCA
                 "UPCE" -> UPCE0
+                // GS1 DataBar
+                // These 3 come from NL's type table and haven't been seen on a CM60L
+                "RSS14", "RSSLIMITED" -> GS1_DATABAR
+                "RSSEXPANDED" -> GS1_DATABAR_EXPANDED
+                "RSSFAMILY" -> GS1_DATABAR  // the CM60L sends this for plain and Expanded alike
                 // 2D
-                "QRCode" -> QRCODE
+                "QRCODE" -> QRCODE
                 "DATAMATRIX" -> DATAMATRIX
                 "PDF417" -> PDF417
                 "MICROQR" -> MICROQR
+                "AZTEC" -> AZTEC
+                "MAXICODE" -> MAXICODE
                 else -> UNKNOWN
             }
         }
@@ -336,6 +346,33 @@ enum class BarcodeTypes(val code: String) {
             else -> null
         }
     }
+    fun newlandHasLengthControl(): Boolean = when(this) {
+        AZTEC, CODABAR, CODE128, CODE39, CODE93, DATAMATRIX, EAN128, I2OF5, MAXICODE, MICROQR, PDF417, QRCODE -> true
+        else -> false
+    }
+    fun newlandDecoderName(): String?{
+        return when(this) {
+            AZTEC -> "AZTEC"
+            CODABAR -> "CODABAR"
+            CODE128 -> "CODE128"
+            CODE39 -> "CODE39"
+            CODE93 -> "CODE93"
+            DATAMATRIX -> "DM"
+            EAN8 -> "EAN8"
+            EAN13 -> "EAN13"
+            EAN128 -> "UCCEAN128"
+            GS1_DATABAR -> "RSS"
+            GS1_DATABAR_EXPANDED -> "RSS"
+            I2OF5 -> "ITF"
+            MAXICODE -> "MAXIC"
+            MICROQR -> "MICROQR"
+            PDF417 -> "PDF417"
+            QRCODE -> "QR"
+            UPCA -> "UPCA"
+            UPCE0 -> "UPCE"
+            else -> null
+        }
+    }
     fun zebraDisableBarcode(bundle: Bundle) {
         val decoderName = zebraDecoderName()
         if(decoderName != null) {
@@ -352,6 +389,14 @@ enum class BarcodeTypes(val code: String) {
             bundle.putBoolean("${decoderName}_ENABLED", false)
         }else{
             Log.w("BarcodeTypes", "honeywellDisableBarcode: Invalid barcode type: $this")
+        }
+    }
+    fun newlandDisableBarcode(lst: ArrayList<NewlandBarcodeSetting>) {
+        val decoderName = newlandDecoderName()
+        if(decoderName != null) {
+            lst.add(NewlandBarcodeSetting(decoderName, "Enable", "0"))
+        }else{
+            Log.w("BarcodeTypes", "newlandDisableBarcode: Invalid barcode type: $this")
         }
     }
     fun datalogicDisableBarcode(lst: ArrayList<String>) {
