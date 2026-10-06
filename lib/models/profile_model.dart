@@ -87,6 +87,8 @@ class ZebraProfileModel extends ProfileModel {
 ///   apps.
 /// - `keepDefaults: false` switches symbologies off, and only Restore default in the scanner settings
 ///   switches them back on.
+/// - Restore default also switches broadcast output off, so scans stop arriving until
+///   `Scanwedge.initialize()` runs again.
 /// - `gs1DataBar` and `gs1DataBarExpanded` share one switch, so asking for either enables both. On a
 ///   CM60L both also read back as `gs1DataBar`.
 /// - The scanner keeps a `minLength` above its current max length, so set both.

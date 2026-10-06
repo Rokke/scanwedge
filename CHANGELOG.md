@@ -87,6 +87,11 @@
 * The DataLogic property map is logged at info instead of debug — a rejected COMMIT gives no feedback, so this map is the only evidence of what the profile actually asked for
 * Added `BarcodePlugin.withType()` and a `toString()` that shows the symbology and its length range
 
-## 1.1.7
+## 1.2.0
+* Newland scan profiles now actually apply: `enabledBarcodes`, `keepDefaults`, lengths and the new `NewlandProfileModel` settings (#20). Thanks to @M-Ahal, who verified every setting and symbology name on a Newland NLS-MT95, and found DataBar and Micro QR reads coming back as `unknown` along the way.
+* Newland: `initialize()` now switches the scanner to broadcast output. In any other output mode the scanner types into the focused field, so no scans reached the app unless the device had been switched to broadcast by hand. This, like every Newland profile setting, applies to the whole device and stays after the app exits — the `NewlandProfileModel` docs list what that means in practice
+* Newland: GS1 DataBar, Code 93, Codabar, Interleaved 2 of 5, Aztec and MaxiCode reads now map to their `BarcodeTypes` instead of `unknown`
+* Added `microqr` to the Dart `BarcodeTypes`. Only the Kotlin side had it, so Micro QR reads arrived as `unknown`. A new enum value can break an exhaustive `switch` over `BarcodeTypes`
+* Added `NewlandProfileModel` and `NewlandTriggerMode`
 * `ExtendedBatteryStatus.createdAt` can now be supplied to the constructor instead of always being `DateTime.now()`. A live reading is unaffected - omitting it still stamps the moment the object is built - but a caller reconstructing a stored or synthetic reading can now say when it was actually taken. Screens that print the reading time could otherwise never be tested or captured deterministically
 * `ExtendedBatteryStatus.fromJson` reads `createdAt` back, so it round-trips with `toJson`, which has always written it. A live intent never carries the field, so a reading straight off the device is unchanged

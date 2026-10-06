@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:scanwedge/scanwedge.dart';
+import 'package:scanwedge/scanwedge_channel.dart' show SupportedDevice;
 
 void main() {
   runApp(const MyApp());
@@ -54,8 +55,8 @@ class _MyAppState extends State<MyApp> {
   _createProfile() async {
     try {
       final wasCreateProfileSuccessful = await _scanwedgePlugin?.createScanProfile(
-        switch (_scanwedgePlugin?.manufacturer) {
-          'ZEBRA' => ZebraProfileModel(
+        switch (_scanwedgePlugin?.supportedDevice) {
+          SupportedDevice.zebra => ZebraProfileModel(
               profileName: widget._demoProfileName,
               enabledBarcodes: [
                 BarcodeConfig(barcodeType: BarcodeTypes.datamatrix),
@@ -65,7 +66,7 @@ class _MyAppState extends State<MyApp> {
               enableKeyStroke: !notifierDisableKeystroke.value,
               aimType: notifierAimType.value,
             ),
-          'Honeywell' => HoneywellProfileModel(
+          SupportedDevice.honeywell => HoneywellProfileModel(
               profileName: widget._demoProfileName,
               enableEanCheckDigitTransmission: true,
               enabledBarcodes: [
@@ -74,6 +75,16 @@ class _MyAppState extends State<MyApp> {
                 BarcodeConfig(barcodeType: BarcodeTypes.ean8),
                 BarcodeConfig(barcodeType: BarcodeTypes.ean13),
               ],
+            ),
+          SupportedDevice.newland => NewlandProfileModel(
+              profileName: widget._demoProfileName,
+              enabledBarcodes: [
+                BarcodeTypes.code128.create(minLength: 10, maxLength: 15),
+                BarcodeTypes.ean13.create(),
+                BarcodeTypes.qrCode.create(),
+                BarcodeTypes.datamatrix.create(),
+              ],
+              triggerMode: NewlandTriggerMode.pulse,
             ),
           _ => ProfileModel(
               profileName: widget._demoProfileName,

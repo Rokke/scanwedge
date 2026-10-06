@@ -139,7 +139,8 @@ internal fun newlandBarcodeSettings(
     return settings
 }
 
-// No BarcodeTypes for these, so their reads come back unknown. Names checked on a CM60L.
+// No BarcodeTypes of their own: ITF14 and ITF6 read back as i2of5 via the plain ITF decoder, the rest
+// as unknown. Names checked on a CM60L.
 private val NEWLAND_UNNAMED_CODE_IDS = listOf(
     "AIM128", "CODE11", "CODE16K", "CODE49", "COMPOSITE", "CSC", "DOTCODE", "IND25", "ISBN", "ISSN",
     "ITF14", "ITF6", "MATRIX25", "MICROPDF", "MSIPLSY", "PLSY", "STD25",

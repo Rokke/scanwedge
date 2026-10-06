@@ -5,7 +5,7 @@ It also has a battery status functionality that can be used to monitor or get th
 Currently it supports Honeywell, Datalogic, Newland, Urovo and Zebra devices.<br>
 This will only work for these Android devices, but it will not have any negative impact on other devices.<br>
 Code inspired by sample code from Honeywell, Zebra and ofcourse the Flutter community.
-Thanks to @M-Ahal for adding Newland support.
+Thanks to @M-Ahal for adding Newland support, and for Newland scan profiles in 1.2.0, verified on their own hardware.
 Thanks to @pedromellofh for adding Urovo support.
 
 ## Getting Started
