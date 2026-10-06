@@ -19,6 +19,7 @@ export 'package:scanwedge/models/plugin_names.dart';
 export 'package:scanwedge/models/profile_model.dart';
 export 'package:scanwedge/models/scanprofile.dart';
 export 'package:scanwedge/models/scanresult.dart';
+export 'package:scanwedge/scanwedge_channel.dart' show SupportedDevice;
 
 class Scanwedge {
   final ScanwedgeChannel _scanwedgeChannel;

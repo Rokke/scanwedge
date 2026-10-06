@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:scanwedge/scanwedge.dart';
-import 'package:scanwedge/scanwedge_channel.dart' show SupportedDevice;
 
 void main() {
   runApp(const MyApp());

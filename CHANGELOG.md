@@ -93,5 +93,6 @@
 * Newland: GS1 DataBar, Code 93, Codabar, Interleaved 2 of 5, Aztec and MaxiCode reads now map to their `BarcodeTypes` instead of `unknown`
 * Added `microqr` to the Dart `BarcodeTypes`. Only the Kotlin side had it, so Micro QR reads arrived as `unknown`. A new enum value can break an exhaustive `switch` over `BarcodeTypes`
 * Added `NewlandProfileModel` and `NewlandTriggerMode`
+* `SupportedDevice` is now exported from `package:scanwedge/scanwedge.dart`. `Scanwedge.supportedDevice` already returned it, but naming the type meant importing `scanwedge_channel.dart` directly
 * `ExtendedBatteryStatus.createdAt` can now be supplied to the constructor instead of always being `DateTime.now()`. A live reading is unaffected - omitting it still stamps the moment the object is built - but a caller reconstructing a stored or synthetic reading can now say when it was actually taken. Screens that print the reading time could otherwise never be tested or captured deterministically
 * `ExtendedBatteryStatus.fromJson` reads `createdAt` back, so it round-trips with `toJson`, which has always written it. A live intent never carries the field, so a reading straight off the device is unchanged
